@@ -1,0 +1,3 @@
+geodat.bob4.fun {
+	reverse_proxy app:3000
+}

@@ -1,0 +1,106 @@
+import { useState, useCallback } from 'react';
+import FileUploader from './components/FileUploader.jsx';
+import SplitEditor from './components/SplitEditor.jsx';
+import ConvertModal from './components/ConvertModal.jsx';
+import Toast from './components/Toast.jsx';
+
+export default function App() {
+  const [editorData, setEditorData] = useState(null);
+  const [donorData, setDonorData] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [showConvert, setShowConvert] = useState(false);
+
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  return (
+    <div className="app">
+      <header className="header">
+        <h1>◆ Geodat Editor</h1>
+        <div className="header-actions">
+          {editorData && (
+            <>
+              <button className="btn" onClick={() => setShowConvert(true)}>
+                ⇄ Convert
+              </button>
+              <button className="btn btn-danger" onClick={() => setEditorData(null)}>
+                ✕ Close Editor
+              </button>
+            </>
+          )}
+          {donorData && (
+            <button className="btn btn-danger" onClick={() => setDonorData(null)}>
+              ✕ Close Donor
+            </button>
+          )}
+        </div>
+      </header>
+
+      <div className="split-container">
+        {!editorData ? (
+          <div className="panel">
+            <div className="panel-header">
+              <span className="label">Editor</span>
+            </div>
+            <FileUploader
+              onLoaded={(data) => {
+                setEditorData(data);
+                showToast(`Loaded: ${data.categories.length} categories`);
+              }}
+              onError={(msg) => showToast(msg, 'error')}
+            />
+          </div>
+        ) : (
+          <SplitEditor
+            editorData={editorData}
+            setEditorData={setEditorData}
+            donorData={donorData}
+            showToast={showToast}
+          />
+        )}
+
+        {!donorData && editorData && (
+          <div className="panel">
+            <div className="panel-header">
+              <span className="label">Donor</span>
+              <span className="filename">— drag a file to use as source</span>
+            </div>
+            <FileUploader
+              onLoaded={(data) => {
+                setDonorData(data);
+                showToast(`Donor loaded: ${data.categories.length} categories`);
+              }}
+              onError={(msg) => showToast(msg, 'error')}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="status-bar">
+        <span>Geodat Editor v1.0</span>
+        {editorData && (
+          <span>
+            {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} categories
+          </span>
+        )}
+        {donorData && (
+          <span>
+            Donor: {donorData.format.toUpperCase()} · {donorData.categories.length} categories
+          </span>
+        )}
+      </div>
+
+      {showConvert && editorData && (
+        <ConvertModal
+          data={editorData}
+          onClose={() => setShowConvert(false)}
+          showToast={showToast}
+        />
+      )}
+
+      {toast && <Toast message={toast.message} type={toast.type} />}
+    </div>
+  );
+}
