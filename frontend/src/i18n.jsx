@@ -30,6 +30,13 @@ const translations = {
     fetch: '↓ Fetch',
     dropFile: 'Drop a file here or click to browse',
     supports: 'Supports: .dat (V2Ray), .mrs (Mihomo), .txt, .yaml',
+    newFile: 'New File',
+    newFileName: 'File name',
+    newFileType: 'Data type',
+    newFileFormat: 'Output format',
+    newFileGeositeDesc: 'Domain names and routing rules',
+    newFileGeoipDesc: 'IP addresses and CIDR ranges',
+    create: 'Create',
 
     // Category list
     addCategory: '+ Category',
@@ -128,6 +135,13 @@ const translations = {
     fetch: '↓ Загрузить',
     dropFile: 'Перетащите файл сюда или нажмите для выбора',
     supports: 'Поддерживает: .dat (V2Ray), .mrs (Mihomo), .txt, .yaml',
+    newFile: 'Новый файл',
+    newFileName: 'Имя файла',
+    newFileType: 'Тип данных',
+    newFileFormat: 'Формат сохранения',
+    newFileGeositeDesc: 'Доменные имена и правила маршрутизации',
+    newFileGeoipDesc: 'IP-адреса и CIDR диапазоны',
+    create: 'Создать',
 
     // Category list
     addCategory: '+ Категория',

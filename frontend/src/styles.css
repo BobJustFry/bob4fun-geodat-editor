@@ -624,6 +624,111 @@ body {
   margin-top: 1rem;
 }
 
+/* Modal header/footer layout */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.modal-footer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* New file form */
+.new-file-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+.new-file-input {
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.new-file-input:focus {
+  border-color: var(--accent);
+}
+.new-file-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.new-file-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 0.5rem;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: inherit;
+  color: var(--text);
+}
+.new-file-type-card:hover {
+  border-color: var(--accent);
+}
+.new-file-type-card.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-tertiary));
+}
+.new-file-type-icon { font-size: 1.5rem; }
+.new-file-type-name { font-size: 0.9rem; font-weight: 600; }
+.new-file-type-desc { font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+.new-file-format-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.new-file-format-btn {
+  padding: 0.35rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+}
+.new-file-format-btn:hover { border-color: var(--accent); }
+.new-file-format-btn.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-tertiary));
+  font-weight: 600;
+}
+
+/* New file button row in uploader */
+.upload-new-file-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
 /* Toast */
 .toast {
   position: fixed;

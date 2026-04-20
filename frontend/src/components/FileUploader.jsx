@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { uploadFile, uploadFromUrl, parseFile, fetchRawFile } from '../api/client.js';
 import { parseGeosite, parseGeoip, detectType } from '../parsers/geodata.js';
 import { useI18n } from '../i18n.jsx';
+import NewFileModal from './NewFileModal.jsx';
 
 // ──────────────────────────────────────────────
 // Pre-upload content validators
@@ -93,6 +94,7 @@ export default function FileUploader({ onLoaded, onError }) {
   const [loading, setLoading] = useState(false);
   const [dragover, setDragover] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [showNewFile, setShowNewFile] = useState(false);
   const inputRef = useRef(null);
 
   const parseDatClientSide = useCallback(async (buffer, filename) => {
@@ -256,6 +258,21 @@ export default function FileUploader({ onLoaded, onError }) {
           onChange={(e) => handleFile(e.target.files[0])}
         />
       </div>
+      <div className="upload-new-file-row">
+        <button className="btn btn-sm" onClick={() => setShowNewFile(true)}>
+          ✦ {t('newFile')}
+        </button>
+      </div>
+
+      {showNewFile && (
+        <NewFileModal
+          onCreated={(data) => {
+            setShowNewFile(false);
+            onLoaded(data);
+          }}
+          onClose={() => setShowNewFile(false)}
+        />
+      )}
     </div>
   );
 }
