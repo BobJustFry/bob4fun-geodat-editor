@@ -28,7 +28,6 @@ export default function Pagination({ total, page, pageSize, onPageChange, onPage
         value={pageSize}
         onChange={(e) => onPageSizeChange(Number(e.target.value))}
       >
-        <option value={25}>25</option>
         <option value={50}>50</option>
         <option value={100}>100</option>
         <option value={Infinity}>{t('all')}</option>

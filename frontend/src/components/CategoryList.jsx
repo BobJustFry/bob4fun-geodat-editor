@@ -9,7 +9,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const [filter, setFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('none'); // 'none', 'asc', 'desc'
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(50);
 
   const handleAdd = () => {
     if (newTag.trim()) {
