@@ -176,8 +176,8 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
             />
             <button className="icon-btn" onClick={selectAll} title={t('selectAll')} style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}>☑</button>
             <button className="icon-btn" onClick={() => setSelectedRules(new Set())} title={t('deselectAll')} style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}>☐</button>
-            <button className="btn btn-sm btn-success" onClick={handleCopy} disabled={selectedRules.size === 0} title={t('copySelectedTitle')}>
-              ← {selectedRules.size > 0 ? selectedRules.size : ''}
+            <button className="btn btn-sm btn-success" onClick={() => { onCopyRules(rules); }} title={t('copyGroupTitle')}>
+              ← {t('copyGroup')}
             </button>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {filteredRules.length}/{rules.length}
