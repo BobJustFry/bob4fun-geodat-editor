@@ -50,7 +50,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
 
   return (
     <div className="category-list" style={width ? { width: `${width}px` } : undefined}>
-      <div style={{ height: '36px', padding: '0 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
         <input
           type="text"
           placeholder={t('filterCategories')}
@@ -58,7 +58,6 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
           onChange={(e) => { setFilter(e.target.value); setPage(1); }}
           style={{
             flex: 1,
-            height: '24px',
             padding: '0.3rem 0.5rem',
             background: 'var(--input-bg)',
             border: '1px solid var(--border)',
@@ -72,13 +71,13 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
           className="icon-btn" 
           onClick={toggleSort}
           title={sortOrder === 'none' ? 'Sort A-Z' : sortOrder === 'asc' ? 'Sort Z-A' : 'No sort'}
-          style={{ width: '24px', height: '24px', padding: 0, flexShrink: 0 }}
+          style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}
         >
           {getSortIcon()}
         </button>
       </div>
 
-      <div style={{ height: '36px', padding: '0 0.5rem', display: 'flex', alignItems: 'center' }}>
+      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
         <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
           {t('addCategory')}
         </button>
@@ -95,7 +94,6 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
             autoFocus
             style={{
               width: '100%',
-              height: '24px',
               padding: '0.3rem 0.5rem',
               background: 'var(--input-bg)',
               border: '1px solid var(--border)',
@@ -105,8 +103,8 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
             }}
           />
           <div style={{ display: 'flex', gap: '0.2rem' }}>
-            <button className="btn btn-sm btn-success" onClick={handleAdd} style={{ flex: 1, height: '24px', padding: '0 0.5rem' }}>{t('add')}</button>
-            <button className="btn btn-sm" onClick={() => setAdding(false)} style={{ flex: 1, height: '24px', padding: '0 0.5rem' }}>{t('cancel')}</button>
+            <button className="btn btn-sm btn-success" onClick={handleAdd} style={{ flex: 1 }}>{t('add')}</button>
+            <button className="btn btn-sm" onClick={() => setAdding(false)} style={{ flex: 1 }}>{t('cancel')}</button>
           </div>
         </div>
       )}
