@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
 
-export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) {
+export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, loading }) {
   const { t } = useI18n();
   const [filter, setFilter] = useState('');
   const [newValue, setNewValue] = useState('');
@@ -51,6 +51,14 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
     return (
       <div className="rule-list-container">
         <div className="loading">{t('selectCategory')}</div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="rule-list-container">
+        <div className="loading"><div className="spinner" />{t('loadingRules')}</div>
       </div>
     );
   }

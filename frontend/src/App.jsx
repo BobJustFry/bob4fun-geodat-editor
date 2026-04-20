@@ -93,6 +93,7 @@ export default function App() {
             editorData={editorData}
             setEditorData={handleEditorUpdate}
             donorData={donorData}
+            setDonorData={setDonorData}
             showToast={showToast}
             onCloseEditor={handleCloseEditor}
             onCloseDonor={handleCloseDonor}
@@ -117,7 +118,7 @@ export default function App() {
       </div>
 
       <div className="status-bar">
-        <span>Geodat Editor v1.6.3</span>
+        <span>Geodat Editor v1.7.0</span>
         {editorData && (
           <span>
             {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} {t('categories')}

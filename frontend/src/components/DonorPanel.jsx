@@ -2,13 +2,15 @@ import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import CategoryList from './CategoryList.jsx';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
+import useResizable from './useResizable.js';
 
-export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type, onClose }) {
+export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type, onClose, loading }) {
   const { t } = useI18n();
   const [filter, setFilter] = useState('');
   const [selectedRules, setSelectedRules] = useState(new Set());
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(100);
+  const donorResize = useResizable({ storageKey: 'donor-cat-width' });
 
   const isDomain = type === 'geosite' || type === 'domain';
   const category = data.categories[selectedCat] || null;
@@ -47,6 +49,8 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
 
   // Drag-to-select
   const dragRef = useRef({ active: false, selecting: true });
+  const ruleListRef = useRef(null);
+  const scrollTimerRef = useRef(null);
 
   const handleDragStart = useCallback((index) => {
     const selecting = !selectedRules.has(index);
@@ -66,9 +70,64 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
   }, []);
 
   useEffect(() => {
-    const handleMouseUp = () => { dragRef.current.active = false; };
+    const handleMouseUp = () => {
+      dragRef.current.active = false;
+      if (scrollTimerRef.current) {
+        cancelAnimationFrame(scrollTimerRef.current);
+        scrollTimerRef.current = null;
+      }
+    };
+
+    const EDGE_ZONE = 60; // px from edge to start scrolling
+    const MAX_SPEED = 20; // max px per frame
+
+    const handleMouseMove = (e) => {
+      if (!dragRef.current.active || !ruleListRef.current) return;
+      const rect = ruleListRef.current.getBoundingClientRect();
+      let speed = 0;
+
+      if (e.clientY < rect.top) {
+        // Above the list — scroll up
+        const dist = Math.min(rect.top - e.clientY, EDGE_ZONE);
+        speed = -(dist / EDGE_ZONE) * MAX_SPEED;
+      } else if (e.clientY > rect.bottom) {
+        // Below the list — scroll down
+        const dist = Math.min(e.clientY - rect.bottom, EDGE_ZONE);
+        speed = (dist / EDGE_ZONE) * MAX_SPEED;
+      } else if (e.clientY < rect.top + EDGE_ZONE) {
+        // Near top edge inside
+        const dist = EDGE_ZONE - (e.clientY - rect.top);
+        speed = -(dist / EDGE_ZONE) * MAX_SPEED;
+      } else if (e.clientY > rect.bottom - EDGE_ZONE) {
+        // Near bottom edge inside
+        const dist = EDGE_ZONE - (rect.bottom - e.clientY);
+        speed = (dist / EDGE_ZONE) * MAX_SPEED;
+      }
+
+      if (speed !== 0) {
+        const doScroll = () => {
+          if (!dragRef.current.active || !ruleListRef.current) return;
+          ruleListRef.current.scrollTop += speed;
+          scrollTimerRef.current = requestAnimationFrame(doScroll);
+        };
+        if (!scrollTimerRef.current) {
+          scrollTimerRef.current = requestAnimationFrame(doScroll);
+        }
+      } else {
+        if (scrollTimerRef.current) {
+          cancelAnimationFrame(scrollTimerRef.current);
+          scrollTimerRef.current = null;
+        }
+      }
+    };
+
     window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (scrollTimerRef.current) cancelAnimationFrame(scrollTimerRef.current);
+    };
   }, []);
 
   const handleCopy = () => {
@@ -100,14 +159,16 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
         )}
         <button className="btn-close" onClick={onClose} title={t('closeDonor')} style={{ marginLeft: selectedRules.size > 0 ? '0.3rem' : 'auto' }}>✕</button>
       </div>
-      <div className="panel-body" style={{ flexDirection: 'row' }}>
+      <div className="panel-body" style={{ flexDirection: 'row' }} ref={donorResize.containerRef}>
         <CategoryList
           categories={data.categories}
           selected={selectedCat}
           onSelect={(i) => { onSelectCat(i); setSelectedRules(new Set()); setFilter(''); }}
           onAdd={() => {}}
           onRemove={() => {}}
+          width={donorResize.width}
         />
+        <div className="resize-handle" onMouseDown={donorResize.onMouseDown} />
         <div className="rule-list-container">
           <div className="rule-toolbar">
             <input
@@ -122,8 +183,10 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
               {filteredRules.length}/{rules.length}
             </span>
           </div>
-          <div className="rule-list">
-            {paginatedRules.map((rule, i) => {
+          <div className="rule-list" ref={ruleListRef}>
+            {loading ? (
+              <div className="loading"><div className="spinner" />{t('loadingRules')}</div>
+            ) : paginatedRules.map((rule, i) => {
               const globalIndex = pageOffset + i;
               const value = isDomain ? rule.value : rule;
               const ruleType = isDomain ? rule.type : null;

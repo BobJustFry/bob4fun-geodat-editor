@@ -28,6 +28,16 @@ export async function parseFile(sessionId, filename) {
   return res.json();
 }
 
+export async function fetchCategoryRules(sessionId, filename, categoryIndex) {
+  const res = await fetch(`${BASE}/parse/rules`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, filename, categoryIndex })
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Fetch rules failed');
+  return res.json();
+}
+
 export async function convertFile(categories, sourceFormat, targetFormat, type) {
   const res = await fetch(`${BASE}/convert`, {
     method: 'POST',

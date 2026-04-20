@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
 
-export default function CategoryList({ categories, selected, onSelect, onAdd, onRemove }) {
+export default function CategoryList({ categories, selected, onSelect, onAdd, onRemove, width }) {
   const { t } = useI18n();
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
@@ -26,7 +26,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const offset = 0;
 
   return (
-    <div className="category-list">
+    <div className="category-list" style={width ? { width: `${width}px` } : undefined}>
       <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
         <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
           {t('addCategory')}

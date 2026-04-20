@@ -19,6 +19,7 @@ const translations = {
 
     // File uploader
     loadingFile: 'Loading file...',
+    loadingRules: 'Loading rules...',
     urlPlaceholder: 'Paste a URL to a file...',
     fetch: '↓ Fetch',
     dropFile: 'Drop a file here or click to browse',
@@ -107,6 +108,7 @@ const translations = {
 
     // File uploader
     loadingFile: 'Загрузка файла...',
+    loadingRules: 'Загрузка правил...',
     urlPlaceholder: 'Вставьте URL файла...',
     fetch: '↓ Загрузить',
     dropFile: 'Перетащите файл сюда или нажмите для выбора',

@@ -7,27 +7,46 @@ import { mrsToText, detectMrsBehavior } from '../parsers/mihomo-mrs.js';
 const TMP_DIR = process.env.TMP_DIR || '/tmp/geodat';
 const router = Router();
 
-router.post('/', async (req, res) => {
-  try {
-    const { sessionId, filename } = req.body;
-    if (!sessionId || !filename) {
-      return res.status(400).json({ error: 'sessionId and filename required' });
-    }
+// In-memory cache for parsed results (sessionId -> full parse result)
+const parseCache = new Map();
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
-    // Sanitize
-    const safeSession = path.basename(sessionId);
-    const safeFilename = path.basename(filename);
-    const filePath = path.join(TMP_DIR, safeSession, safeFilename);
+function setCached(sessionId, data) {
+  parseCache.set(sessionId, { data, ts: Date.now() });
+}
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'File not found' });
-    }
+function getCached(sessionId) {
+  const entry = parseCache.get(sessionId);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CACHE_TTL) {
+    parseCache.delete(sessionId);
+    return null;
+  }
+  return entry.data;
+}
 
-    const buffer = fs.readFileSync(filePath);
-    const ext = path.extname(safeFilename).toLowerCase();
-    const baseName = path.basename(safeFilename, ext).toLowerCase();
+// Cleanup expired cache entries every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of parseCache) {
+    if (now - entry.ts > CACHE_TTL) parseCache.delete(key);
+  }
+}, 10 * 60 * 1000);
 
-    let result;
+async function parseFileFromDisk(sessionId, filename) {
+  const safeSession = path.basename(sessionId);
+  const safeFilename = path.basename(filename);
+  const filePath = path.join(TMP_DIR, safeSession, safeFilename);
+
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  const buffer = fs.readFileSync(filePath);
+  const ext = path.extname(safeFilename).toLowerCase();
+  const baseName = path.basename(safeFilename, ext).toLowerCase();
+
+  let result;
 
     if (ext === '.dat') {
       // V2Ray format
@@ -127,9 +146,72 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: `Unsupported format: ${ext}` });
     }
 
-    res.json(result);
+    return result;
+}
+
+router.post('/', async (req, res) => {
+  try {
+    const { sessionId, filename } = req.body;
+    if (!sessionId || !filename) {
+      return res.status(400).json({ error: 'sessionId and filename required' });
+    }
+
+    const result = await parseFileFromDisk(sessionId, filename);
+    if (!result) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    // Cache full result
+    setCached(sessionId, result);
+
+    // Return summary only (no rules) for fast initial load
+    const summary = {
+      format: result.format,
+      type: result.type,
+      categories: result.categories.map(c => ({
+        tag: c.tag,
+        count: c.count
+      }))
+    };
+
+    res.json(summary);
   } catch (err) {
     console.error('Parse error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Fetch rules for a specific category
+router.post('/rules', async (req, res) => {
+  try {
+    const { sessionId, filename, categoryIndex } = req.body;
+    if (!sessionId || categoryIndex === undefined) {
+      return res.status(400).json({ error: 'sessionId and categoryIndex required' });
+    }
+
+    let data = getCached(sessionId);
+    if (!data && filename) {
+      data = await parseFileFromDisk(sessionId, filename);
+      if (data) setCached(sessionId, data);
+    }
+    if (!data) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    const idx = parseInt(categoryIndex, 10);
+    if (idx < 0 || idx >= data.categories.length) {
+      return res.status(400).json({ error: 'Invalid category index' });
+    }
+
+    const cat = data.categories[idx];
+    res.json({
+      tag: cat.tag,
+      count: cat.count,
+      ...(cat.domains ? { domains: cat.domains } : {}),
+      ...(cat.cidrs ? { cidrs: cat.cidrs } : {})
+    });
+  } catch (err) {
+    console.error('Rules fetch error:', err);
     res.status(500).json({ error: err.message });
   }
 });

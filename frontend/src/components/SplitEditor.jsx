@@ -1,16 +1,94 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import CategoryList from './CategoryList.jsx';
 import RuleEditor from './RuleEditor.jsx';
 import DonorPanel from './DonorPanel.jsx';
-import { downloadFile } from '../api/client.js';
+import { downloadFile, fetchCategoryRules } from '../api/client.js';
 import { useI18n } from '../i18n.jsx';
+import useResizable from './useResizable.js';
 
-export default function SplitEditor({ editorData, setEditorData, donorData, showToast, onCloseEditor, onCloseDonor }) {
+export default function SplitEditor({ editorData, setEditorData, donorData, setDonorData, showToast, onCloseEditor, onCloseDonor }) {
   const { t } = useI18n();
   const [selectedCat, setSelectedCat] = useState(0);
   const [donorSelectedCat, setDonorSelectedCat] = useState(0);
+  const [loadingRules, setLoadingRules] = useState(false);
+  const [loadingDonorRules, setLoadingDonorRules] = useState(false);
+  const editorResize = useResizable({ storageKey: 'editor-cat-width' });
 
   const currentCategory = editorData.categories[selectedCat] || null;
+  const isDomain = editorData.type === 'geosite' || editorData.type === 'domain';
+
+  // Check if a category has its rules loaded
+  const hasRulesLoaded = (cat) => {
+    if (!cat) return false;
+    return cat.domains !== undefined || cat.cidrs !== undefined;
+  };
+
+  // Load rules for editor category
+  const loadEditorRules = useCallback(async (index) => {
+    const cat = editorData.categories[index];
+    if (!cat || hasRulesLoaded(cat)) return;
+    setLoadingRules(true);
+    try {
+      const rules = await fetchCategoryRules(editorData.sessionId, editorData.filename, index);
+      const updated = { ...editorData };
+      updated.categories = [...updated.categories];
+      updated.categories[index] = { ...updated.categories[index], ...rules };
+      setEditorData(updated);
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoadingRules(false);
+    }
+  }, [editorData, setEditorData, showToast]);
+
+  // Load rules for donor category
+  const loadDonorRules = useCallback(async (index) => {
+    if (!donorData) return;
+    const cat = donorData.categories[index];
+    if (!cat || hasRulesLoaded(cat)) return;
+    setLoadingDonorRules(true);
+    try {
+      const rules = await fetchCategoryRules(donorData.sessionId, donorData.filename, index);
+      const updated = { ...donorData };
+      updated.categories = [...updated.categories];
+      updated.categories[index] = { ...updated.categories[index], ...rules };
+      setDonorData(updated);
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoadingDonorRules(false);
+    }
+  }, [donorData, setDonorData, showToast]);
+
+  // Auto-load rules when selected category changes
+  useEffect(() => {
+    loadEditorRules(selectedCat);
+  }, [selectedCat, loadEditorRules]);
+
+  useEffect(() => {
+    if (donorData) loadDonorRules(donorSelectedCat);
+  }, [donorSelectedCat, donorData, loadDonorRules]);
+
+  // Load ALL categories rules (for v2ray download)
+  const loadAllEditorRules = useCallback(async () => {
+    const missing = editorData.categories
+      .map((cat, i) => hasRulesLoaded(cat) ? null : i)
+      .filter(i => i !== null);
+    if (missing.length === 0) return;
+    setLoadingRules(true);
+    try {
+      const updated = { ...editorData, categories: [...editorData.categories] };
+      for (const idx of missing) {
+        const rules = await fetchCategoryRules(editorData.sessionId, editorData.filename, idx);
+        updated.categories[idx] = { ...updated.categories[idx], ...rules };
+      }
+      setEditorData(updated);
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoadingRules(false);
+    }
+  }, [editorData, setEditorData, showToast]);
 
   const handleAddRule = (rule) => {
     const updated = { ...editorData };
@@ -111,6 +189,10 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
 
   const handleDownload = async (format) => {
     try {
+      // For v2ray, need all categories loaded
+      if (format === 'v2ray') {
+        await loadAllEditorRules();
+      }
       const cats = (format === 'mrs' || format === 'text')
         ? [editorData.categories[selectedCat]]
         : editorData.categories;
@@ -161,20 +243,23 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
             <button className="btn-close" onClick={onCloseEditor} title={t('closeEditor')}>✕</button>
           </div>
         </div>
-        <div className="panel-body" style={{ flexDirection: 'row' }}>
+        <div className="panel-body" style={{ flexDirection: 'row' }} ref={editorResize.containerRef}>
           <CategoryList
             categories={editorData.categories}
             selected={selectedCat}
             onSelect={setSelectedCat}
             onAdd={handleAddCategory}
             onRemove={handleRemoveCategory}
+            width={editorResize.width}
           />
+          <div className="resize-handle" onMouseDown={editorResize.onMouseDown} />
           <RuleEditor
             category={currentCategory}
             type={editorData.type}
             onAdd={handleAddRule}
             onRemove={handleRemoveRule}
             onEdit={handleEditRule}
+            loading={loadingRules}
           />
         </div>
       </div>
@@ -187,6 +272,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
           onCopyRules={handleCopyFromDonor}
           type={editorData.type}
           onClose={onCloseDonor}
+          loading={loadingDonorRules}
         />
       )}
     </>
