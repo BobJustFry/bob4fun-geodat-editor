@@ -173,8 +173,8 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
                 }}
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
-                <button className="btn btn-sm btn-success" onClick={handleSaveEdit}>{t('add')}</button>
-                <button className="btn btn-sm" onClick={cancelEditing}>{t('cancel')}</button>
+                <button className="btn btn-sm btn-success" onClick={handleSaveEdit}>✓</button>
+                <button className="btn btn-sm" onClick={cancelEditing}>✗</button>
               </div>
             </div>
           ) : (
