@@ -90,15 +90,16 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
     }
   }, [editorData, setEditorData, showToast]);
 
-  const handleAddRule = (rule) => {
+  const handleAddRule = (ruleOrRules) => {
+    const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
     const updated = { ...editorData };
     const cat = { ...updated.categories[selectedCat] };
 
     if (editorData.type === 'geosite' || editorData.type === 'domain') {
-      cat.domains = [...(cat.domains || []), rule];
+      cat.domains = [...(cat.domains || []), ...rules];
       cat.count = cat.domains.length;
     } else {
-      cat.cidrs = [...(cat.cidrs || []), rule];
+      cat.cidrs = [...(cat.cidrs || []), ...rules];
       cat.count = cat.cidrs.length;
     }
 

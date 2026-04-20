@@ -135,10 +135,8 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
             return;
           }
 
-          // Добавляем все валидные правила
-          values.forEach(v => {
-            onAdd({ type: newType, value: v, attrs: [] });
-          });
+          // Добавляем все валидные правила одним вызовом
+          onAdd(values.map(v => ({ type: newType, value: v, attrs: [] })));
         } else {
           // Нормализуем IPv4 адреса
           const processedValues = values.map(v => {
@@ -157,8 +155,8 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
             return;
           }
 
-          // Добавляем все валидные правила
-          processedValues.forEach(v => onAdd(v));
+          // Добавляем все валидные правила одним вызовом
+          onAdd(processedValues);
         }
       } catch (err) {
         // Ошибка при чтении clipboard - игнорируем
