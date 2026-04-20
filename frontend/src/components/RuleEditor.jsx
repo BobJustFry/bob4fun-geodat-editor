@@ -31,6 +31,45 @@ const isValidCIDR = (cidr) => {
   return ipv6Regex.test(cidr);
 };
 
+// Нормализация IPv4 адреса - автоматическое дополнение маски подсети
+const normalizeIPv4 = (input) => {
+  if (!input || typeof input !== 'string') return null;
+  
+  const trimmed = input.trim();
+  
+  // Если уже есть маска, валидируем как есть
+  if (trimmed.includes('/')) {
+    return isValidCIDR(trimmed) ? trimmed : null;
+  }
+  
+  // Парсим IP адрес
+  const parts = trimmed.split('.');
+  
+  // Должно быть от 1 до 4 октетов
+  if (parts.length < 1 || parts.length > 4) return null;
+  
+  // Проверяем что все части - числа от 0-255
+  const octets = [];
+  for (let part of parts) {
+    if (!part) return null; // Пустой октет
+    const num = parseInt(part);
+    if (isNaN(num) || num < 0 || num > 255) return null;
+    octets.push(num);
+  }
+  
+  // Дополняем нулями до полного IPv4
+  while (octets.length < 4) {
+    octets.push(0);
+  }
+  
+  // Вычисляем маску на основе количества введенных октетов
+  const prefixLength = parts.length * 8;
+  
+  const fullIP = octets.join('.');
+  return `${fullIP}/${prefixLength}`;
+};
+
+
 export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, loading }) {
   const { t } = useI18n();
   const [filter, setFilter] = useState('');
@@ -79,20 +118,38 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
 
         if (values.length === 0) return;
 
-        // Валидируем все значения
-        const isValid = values.every(v => isDomain ? isValidDomain(v) : isValidCIDR(v));
-        if (!isValid) {
-          // Если не все валидны, не добавляем ничего
-          return;
-        }
-
-        // Добавляем все валидные правила
         if (isDomain) {
+          // Валидируем все значения
+          const isValid = values.every(v => isValidDomain(v));
+          if (!isValid) {
+            // Если не все валидны, не добавляем ничего
+            return;
+          }
+
+          // Добавляем все валидные правила
           values.forEach(v => {
             onAdd({ type: newType, value: v, attrs: [] });
           });
         } else {
-          values.forEach(v => onAdd(v));
+          // Нормализуем IPv4 адреса
+          const processedValues = values.map(v => {
+            // Если это похоже на IPv4 (содержит только точки и цифры), пытаемся нормализовать
+            if (/^[\d.\/]+$/.test(v)) {
+              const normalized = normalizeIPv4(v);
+              return normalized || v;
+            }
+            return v; // IPv6 передаем как есть
+          });
+          
+          // Валидируем все значения
+          const isValid = processedValues.every(v => isValidCIDR(v));
+          if (!isValid) {
+            // Если не все валидны, не добавляем ничего
+            return;
+          }
+
+          // Добавляем все валидные правила
+          processedValues.forEach(v => onAdd(v));
         }
       } catch (err) {
         // Ошибка при чтении clipboard - игнорируем
@@ -133,8 +190,18 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
     } else {
       // Support adding multiple values separated by newlines or commas
       const values = val.split(/[,\n\r]+/).map(v => v.trim()).filter(Boolean);
-      // Валидируем перед добавлением
-      const validValues = values.filter(v => isValidCIDR(v));
+      
+      // Нормализуем IPv4 адреса и валидируем
+      const processedValues = values.map(v => {
+        // Если это похоже на IPv4 (содержит только точки и цифры), пытаемся нормализовать
+        if (/^[\d.\/]+$/.test(v)) {
+          const normalized = normalizeIPv4(v);
+          return normalized || v;
+        }
+        return v; // IPv6 передаем как есть
+      });
+      
+      const validValues = processedValues.filter(v => isValidCIDR(v));
       if (validValues.length === 0) return; // Не добавляем если нет валидных
       validValues.forEach(v => onAdd(v));
     }
@@ -222,13 +289,22 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
                     if (e.key === 'Enter') {
                       const trimmed = editValue.trim();
                       if (!trimmed) return;
+                      
+                      // Нормализуем IPv4 если нужно
+                      let finalValue = trimmed;
+                      if (!isDomain && /^[\d.\/]+$/.test(trimmed)) {
+                        const normalized = normalizeIPv4(trimmed);
+                        if (!normalized) return; // Не сохраняем если нормализация не удалась
+                        finalValue = normalized;
+                      }
+                      
                       // Валидируем перед сохранением
-                      const isValid = isDomain ? isValidDomain(trimmed) : isValidCIDR(trimmed);
+                      const isValid = isDomain ? isValidDomain(finalValue) : isValidCIDR(finalValue);
                       if (!isValid) return; // Не сохраняем невалидные данные
                       
                       const newRule = isDomain
-                        ? { type: editType, value: trimmed, attrs: rule.attrs || [] }
-                        : trimmed;
+                        ? { type: editType, value: finalValue, attrs: rule.attrs || [] }
+                        : finalValue;
                       onEdit(actualIndex, newRule);
                       setEditingIndex(null);
                     } else if (e.key === 'Escape') {
@@ -241,13 +317,22 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
                 <button className="btn btn-sm btn-success" onClick={() => {
                   const trimmed = editValue.trim();
                   if (!trimmed) return;
+                  
+                  // Нормализуем IPv4 если нужно
+                  let finalValue = trimmed;
+                  if (!isDomain && /^[\d.\/]+$/.test(trimmed)) {
+                    const normalized = normalizeIPv4(trimmed);
+                    if (!normalized) return; // Не сохраняем если нормализация не удалась
+                    finalValue = normalized;
+                  }
+                  
                   // Валидируем перед сохранением
-                  const isValid = isDomain ? isValidDomain(trimmed) : isValidCIDR(trimmed);
+                  const isValid = isDomain ? isValidDomain(finalValue) : isValidCIDR(finalValue);
                   if (!isValid) return; // Не сохраняем невалидные данные
                   
                   const newRule = isDomain
-                    ? { type: editType, value: trimmed, attrs: rule.attrs || [] }
-                    : trimmed;
+                    ? { type: editType, value: finalValue, attrs: rule.attrs || [] }
+                    : finalValue;
                   onEdit(actualIndex, newRule);
                   setEditingIndex(null);
                 }}>✓</button>
