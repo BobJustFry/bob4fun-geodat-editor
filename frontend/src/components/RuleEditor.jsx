@@ -42,8 +42,11 @@ const normalizeIPv4 = (input) => {
     return isValidCIDR(trimmed) ? trimmed : null;
   }
   
+  // Убираем trailing точку если есть
+  const cleaned = trimmed.endsWith('.') ? trimmed.slice(0, -1) : trimmed;
+  
   // Парсим IP адрес
-  const parts = trimmed.split('.');
+  const parts = cleaned.split('.');
   
   // Должно быть от 1 до 4 октетов
   if (parts.length < 1 || parts.length > 4) return null;
@@ -57,13 +60,17 @@ const normalizeIPv4 = (input) => {
     octets.push(num);
   }
   
+  // Вычисляем маску на основе значимых октетов (без trailing нулей)
+  let significantCount = octets.length;
+  while (significantCount > 1 && octets[significantCount - 1] === 0) {
+    significantCount--;
+  }
+  const prefixLength = significantCount * 8;
+  
   // Дополняем нулями до полного IPv4
   while (octets.length < 4) {
     octets.push(0);
   }
-  
-  // Вычисляем маску на основе количества введенных октетов
-  const prefixLength = parts.length * 8;
   
   const fullIP = octets.join('.');
   return `${fullIP}/${prefixLength}`;
