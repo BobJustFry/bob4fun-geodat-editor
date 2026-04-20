@@ -243,7 +243,8 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
       const { blob, filename } = await downloadFile(
         cats,
         format,
-        editorData.type
+        editorData.type,
+        editorData.filename
       );
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
