@@ -99,16 +99,18 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
   // Обработчик Ctrl+V для вставки правил
   useEffect(() => {
     const handlePaste = async (e) => {
-      // Проверяем, что фокус на input в rule-list-container
-      const ruleListContainer = document.querySelector('.rule-list-container');
-      if (!ruleListContainer || !ruleListContainer.contains(document.activeElement)) return;
+      // Не перехватываем вставку, если фокус на input/textarea (пользователь редактирует текст)
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
       
-      // Не трогаем если это input редактирования (не в режиме редактирования)
+      // Не трогаем если в режиме редактирования правила
       if (editingIndex !== null) return;
 
       try {
-        const text = await navigator.clipboard.readText();
+        const text = e.clipboardData ? e.clipboardData.getData('text') : await navigator.clipboard.readText();
         if (!text) return;
+
+        e.preventDefault();
 
         // Парсим данные: могут быть разделены запятой или новой строкой
         const values = text
