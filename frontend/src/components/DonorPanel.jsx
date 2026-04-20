@@ -23,11 +23,10 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
 
   const paginatedRules = useMemo(() => {
     if (pageSize === Infinity) return filteredRules;
-    const start = (page - 1) * pageSize;
-    return filteredRules.slice(start, start + pageSize);
+    return filteredRules.slice(0, page * pageSize);
   }, [filteredRules, page, pageSize]);
 
-  const pageOffset = pageSize === Infinity ? 0 : (page - 1) * pageSize;
+  const pageOffset = 0;
 
   const toggleRule = (index) => {
     const next = new Set(selectedRules);
@@ -123,6 +122,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
             pageSize={pageSize}
             onPageChange={setPage}
             onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+            onLoadMore={() => setPage(p => p + 1)}
           />
         </div>
       </div>

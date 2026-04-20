@@ -1,28 +1,24 @@
-import { useState } from 'react';
-
-export default function Pagination({ total, page, pageSize, onPageChange, onPageSizeChange }) {
-  const totalPages = Math.ceil(total / pageSize);
+export default function Pagination({ total, page, pageSize, onPageChange, onPageSizeChange, onLoadMore }) {
+  const shown = Math.min(page * pageSize, total);
+  const hasMore = shown < total;
+  const remaining = total - shown;
 
   return (
     <div className="pagination">
       <div className="pagination-controls">
-        <button
-          className="btn btn-sm"
-          disabled={page <= 1}
-          onClick={() => onPageChange(page - 1)}
-        >
-          ‹
-        </button>
         <span className="pagination-info">
-          {page}/{totalPages || 1} ({total})
+          {shown}/{total}
         </span>
-        <button
-          className="btn btn-sm"
-          disabled={page >= totalPages}
-          onClick={() => onPageChange(page + 1)}
-        >
-          ›
-        </button>
+        {hasMore && (
+          <button className="btn btn-sm" onClick={onLoadMore}>
+            + Load more ({remaining})
+          </button>
+        )}
+        {page > 1 && (
+          <button className="btn btn-sm" onClick={() => onPageChange(1)}>
+            Collapse
+          </button>
+        )}
       </div>
       <select
         className="pagination-size"

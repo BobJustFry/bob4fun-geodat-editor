@@ -62,6 +62,18 @@ export default function FileUploader({ onLoaded, onError }) {
 
   return (
     <div className="upload-container">
+      <div className="url-input-row">
+        <input
+          type="text"
+          placeholder="Paste a URL to a file..."
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleUrl()}
+        />
+        <button className="btn btn-sm" onClick={handleUrl} disabled={!urlInput.trim()}>
+          ↓ Fetch
+        </button>
+      </div>
       <div
         className={`upload-zone ${dragover ? 'dragover' : ''}`}
         onClick={() => inputRef.current?.click()}
@@ -81,18 +93,6 @@ export default function FileUploader({ onLoaded, onError }) {
           style={{ display: 'none' }}
           onChange={(e) => handleFile(e.target.files[0])}
         />
-      </div>
-      <div className="url-input-row">
-        <input
-          type="text"
-          placeholder="Or paste a URL to a file..."
-          value={urlInput}
-          onChange={(e) => setUrlInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleUrl()}
-        />
-        <button className="btn btn-sm" onClick={handleUrl} disabled={!urlInput.trim()}>
-          ↓ Fetch
-        </button>
       </div>
     </div>
   );

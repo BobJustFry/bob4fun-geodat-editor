@@ -18,11 +18,10 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const totalPages = Math.ceil(categories.length / pageSize);
   const visibleCategories = useMemo(() => {
     if (pageSize === Infinity) return categories;
-    const start = (page - 1) * pageSize;
-    return categories.slice(start, start + pageSize);
+    return categories.slice(0, page * pageSize);
   }, [categories, page, pageSize]);
 
-  const offset = pageSize === Infinity ? 0 : (page - 1) * pageSize;
+  const offset = 0;
 
   return (
     <div className="category-list">
@@ -92,6 +91,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
           pageSize={pageSize}
           onPageChange={setPage}
           onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+          onLoadMore={() => setPage(p => p + 1)}
         />
       )}
     </div>
