@@ -890,10 +890,6 @@ body {
 }
 
 .category-list > div:nth-child(2) {
-  position: sticky;
-  top: 80px;
-  z-index: 10;
-  background: var(--bg-secondary);
   flex-shrink: 0;
 }
 
