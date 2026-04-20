@@ -1,6 +1,35 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
+
+// Валидация домена
+const isValidDomain = (domain) => {
+  // Поддержка простых доменов, поддоменов, regex и wildcard
+  if (!domain) return false;
+  // Базовая проверка: не может содержать опасные символы
+  const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$|^[a-zA-Z0-9\*\.\-]+$/;
+  return domainRegex.test(domain);
+};
+
+// Валидация IP адреса (IPv4 и IPv6, включая CIDR нотацию)
+const isValidCIDR = (cidr) => {
+  if (!cidr) return false;
+  // IPv4 CIDR: xxx.xxx.xxx.xxx/xx
+  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/;
+  // IPv6 CIDR: xxxx:xxxx:... или :: нотация
+  const ipv6Regex = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}(\/\d{1,3})?$|^::([0-9a-fA-F]{0,4}:)*[0-9a-fA-F]{0,4}(\/\d{1,3})?$|^[0-9a-fA-F]{0,4}::(\/\d{1,3})?$/;
+  
+  if (ipv4Regex.test(cidr)) {
+    const [ip, prefix] = cidr.split('/');
+    const octets = ip.split('.').map(Number);
+    if (octets.every(o => o >= 0 && o <= 255)) {
+      if (prefix) return parseInt(prefix) >= 0 && parseInt(prefix) <= 32;
+      return true;
+    }
+    return false;
+  }
+  return ipv6Regex.test(cidr);
+};
 
 export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, loading }) {
   const { t } = useI18n();
@@ -12,9 +41,67 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
   const [editingIndex, setEditingIndex] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [editType, setEditType] = useState('');
+  const [invalidRules, setInvalidRules] = useState(new Set()); // Отслеживание невалидных правил
 
   const isDomain = type === 'geosite' || type === 'domain';
   const rules = isDomain ? (category?.domains || []) : (category?.cidrs || []);
+
+  // Валидация всех правил при загрузке
+  useEffect(() => {
+    const invalid = new Set();
+    rules.forEach((rule, idx) => {
+      const value = isDomain ? rule.value : rule;
+      const isValid = isDomain ? isValidDomain(value) : isValidCIDR(value);
+      if (!isValid) invalid.add(idx);
+    });
+    setInvalidRules(invalid);
+  }, [rules, isDomain]);
+
+  // Обработчик Ctrl+V для вставки правил
+  useEffect(() => {
+    const handlePaste = async (e) => {
+      // Проверяем, что фокус на input в rule-list-container
+      const ruleListContainer = document.querySelector('.rule-list-container');
+      if (!ruleListContainer || !ruleListContainer.contains(document.activeElement)) return;
+      
+      // Не трогаем если это input редактирования (не в режиме редактирования)
+      if (editingIndex !== null) return;
+
+      try {
+        const text = await navigator.clipboard.readText();
+        if (!text) return;
+
+        // Парсим данные: могут быть разделены запятой или новой строкой
+        const values = text
+          .split(/[,\n\r]+/)
+          .map(v => v.trim())
+          .filter(v => v && v.length > 0);
+
+        if (values.length === 0) return;
+
+        // Валидируем все значения
+        const isValid = values.every(v => isDomain ? isValidDomain(v) : isValidCIDR(v));
+        if (!isValid) {
+          // Если не все валидны, не добавляем ничего
+          return;
+        }
+
+        // Добавляем все валидные правила
+        if (isDomain) {
+          values.forEach(v => {
+            onAdd({ type: newType, value: v, attrs: [] });
+          });
+        } else {
+          values.forEach(v => onAdd(v));
+        }
+      } catch (err) {
+        // Ошибка при чтении clipboard - игнорируем
+      }
+    };
+
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [isDomain, newType, onAdd, editingIndex]);
 
   const filteredRules = useMemo(() => {
     if (!filter) return rules;
@@ -35,14 +122,21 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
     if (!val) return;
 
     if (isDomain) {
-      // Support adding multiple values separated by newlines
-      const values = val.split('\n').map(v => v.trim()).filter(Boolean);
-      values.forEach(v => {
+      // Support adding multiple values separated by newlines or commas
+      const values = val.split(/[,\n\r]+/).map(v => v.trim()).filter(Boolean);
+      // Валидируем перед добавлением
+      const validValues = values.filter(v => isValidDomain(v));
+      if (validValues.length === 0) return; // Не добавляем если нет валидных
+      validValues.forEach(v => {
         onAdd({ type: newType, value: v, attrs: [] });
       });
     } else {
-      const values = val.split('\n').map(v => v.trim()).filter(Boolean);
-      values.forEach(v => onAdd(v));
+      // Support adding multiple values separated by newlines or commas
+      const values = val.split(/[,\n\r]+/).map(v => v.trim()).filter(Boolean);
+      // Валидируем перед добавлением
+      const validValues = values.filter(v => isValidCIDR(v));
+      if (validValues.length === 0) return; // Не добавляем если нет валидных
+      validValues.forEach(v => onAdd(v));
     }
     setNewValue('');
   };
@@ -126,10 +220,16 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
+                      const trimmed = editValue.trim();
+                      if (!trimmed) return;
+                      // Валидируем перед сохранением
+                      const isValid = isDomain ? isValidDomain(trimmed) : isValidCIDR(trimmed);
+                      if (!isValid) return; // Не сохраняем невалидные данные
+                      
                       const newRule = isDomain
-                        ? { type: editType, value: editValue.trim(), attrs: rule.attrs || [] }
-                        : editValue.trim();
-                      if (editValue.trim()) onEdit(actualIndex, newRule);
+                        ? { type: editType, value: trimmed, attrs: rule.attrs || [] }
+                        : trimmed;
+                      onEdit(actualIndex, newRule);
                       setEditingIndex(null);
                     } else if (e.key === 'Escape') {
                       setEditingIndex(null);
@@ -139,10 +239,16 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
                   style={{ flex: 1, fontSize: '0.8rem', padding: '0.2rem 0.3rem' }}
                 />
                 <button className="btn btn-sm btn-success" onClick={() => {
+                  const trimmed = editValue.trim();
+                  if (!trimmed) return;
+                  // Валидируем перед сохранением
+                  const isValid = isDomain ? isValidDomain(trimmed) : isValidCIDR(trimmed);
+                  if (!isValid) return; // Не сохраняем невалидные данные
+                  
                   const newRule = isDomain
-                    ? { type: editType, value: editValue.trim(), attrs: rule.attrs || [] }
-                    : editValue.trim();
-                  if (editValue.trim()) onEdit(actualIndex, newRule);
+                    ? { type: editType, value: trimmed, attrs: rule.attrs || [] }
+                    : trimmed;
+                  onEdit(actualIndex, newRule);
                   setEditingIndex(null);
                 }}>✓</button>
                 <button className="btn btn-sm" onClick={() => setEditingIndex(null)}>✗</button>
@@ -152,6 +258,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
 
           return (
             <div key={`${value}-${i}`} className="rule-item">
+              {invalidRules.has(actualIndex) && <span title="Invalid format" style={{ color: 'var(--warning)', fontSize: '0.9rem', flexShrink: 0 }}>⚠️</span>}
               {ruleType && <span className="rule-type">{ruleType}</span>}
               <span className="rule-value" title={value}>{value}</span>
               <div className="rule-actions">

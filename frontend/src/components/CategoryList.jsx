@@ -50,40 +50,42 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
 
   return (
     <div className="category-list" style={width ? { width: `${width}px` } : undefined}>
-      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-          <input
-            type="text"
-            placeholder={t('filterCategories')}
-            value={filter}
-            onChange={(e) => { setFilter(e.target.value); setPage(1); }}
-            style={{
-              flex: 1,
-              padding: '0.3rem 0.5rem',
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
-              borderRadius: '3px',
-              color: 'var(--text)',
-              fontSize: '0.8rem',
-              outline: 'none'
-            }}
-          />
-          <button 
-            className="icon-btn" 
-            onClick={toggleSort}
-            title={sortOrder === 'none' ? 'Sort A-Z' : sortOrder === 'asc' ? 'Sort Z-A' : 'No sort'}
-            style={{ width: '32px', height: '32px', padding: 0 }}
-          >
-            {getSortIcon()}
-          </button>
-        </div>
+      <div style={{ height: '36px', padding: '0 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+        <input
+          type="text"
+          placeholder={t('filterCategories')}
+          value={filter}
+          onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+          style={{
+            flex: 1,
+            height: '24px',
+            padding: '0.3rem 0.5rem',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '3px',
+            color: 'var(--text)',
+            fontSize: '0.8rem',
+            outline: 'none'
+          }}
+        />
+        <button 
+          className="icon-btn" 
+          onClick={toggleSort}
+          title={sortOrder === 'none' ? 'Sort A-Z' : sortOrder === 'asc' ? 'Sort Z-A' : 'No sort'}
+          style={{ width: '24px', height: '24px', padding: 0, flexShrink: 0 }}
+        >
+          {getSortIcon()}
+        </button>
+      </div>
+
+      <div style={{ height: '36px', padding: '0 0.5rem', display: 'flex', alignItems: 'center' }}>
         <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
           {t('addCategory')}
         </button>
       </div>
 
       {adding && (
-        <div style={{ padding: '0.3rem', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <input
             type="text"
             value={newTag}
@@ -93,7 +95,8 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
             autoFocus
             style={{
               width: '100%',
-              padding: '0.3rem',
+              height: '24px',
+              padding: '0.3rem 0.5rem',
               background: 'var(--input-bg)',
               border: '1px solid var(--border)',
               borderRadius: '3px',
@@ -101,9 +104,9 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
               fontSize: '0.8rem'
             }}
           />
-          <div style={{ display: 'flex', gap: '0.2rem', marginTop: '0.2rem' }}>
-            <button className="btn btn-sm btn-success" onClick={handleAdd}>{t('add')}</button>
-            <button className="btn btn-sm" onClick={() => setAdding(false)}>{t('cancel')}</button>
+          <div style={{ display: 'flex', gap: '0.2rem' }}>
+            <button className="btn btn-sm btn-success" onClick={handleAdd} style={{ flex: 1, height: '24px', padding: '0 0.5rem' }}>{t('add')}</button>
+            <button className="btn btn-sm" onClick={() => setAdding(false)} style={{ flex: 1, height: '24px', padding: '0 0.5rem' }}>{t('cancel')}</button>
           </div>
         </div>
       )}
