@@ -8,6 +8,16 @@ export async function uploadFile(file) {
   return res.json();
 }
 
+export async function uploadFromUrl(url) {
+  const res = await fetch(`${BASE}/upload/from-url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url })
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'URL fetch failed');
+  return res.json();
+}
+
 export async function parseFile(sessionId, filename) {
   const res = await fetch(`${BASE}/parse`, {
     method: 'POST',
