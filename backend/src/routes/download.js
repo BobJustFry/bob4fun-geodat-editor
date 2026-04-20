@@ -28,18 +28,19 @@ router.post('/', async (req, res) => {
     } else if (format === 'mrs') {
       const cat = categories[0];
       let text;
-      if (type === 'domain') {
+      const mrsBehavior = (type === 'geosite' || type === 'domain') ? 'domain' : 'ipcidr';
+      if (type === 'geosite' || type === 'domain') {
         text = (cat.domains || []).map(d => d.value).join('\n');
       } else {
         text = (cat.cidrs || []).join('\n');
       }
-      buffer = await textToMrs(text, type);
+      buffer = await textToMrs(text, mrsBehavior);
       filename = `${cat.tag || 'output'}.mrs`;
       contentType = 'application/octet-stream';
     } else if (format === 'text') {
       const cat = categories[0];
       let text;
-      if (type === 'domain') {
+      if (type === 'geosite' || type === 'domain') {
         text = (cat.domains || []).map(d => d.value).join('\n');
       } else {
         text = (cat.cidrs || []).join('\n');
