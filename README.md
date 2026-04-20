@@ -4,7 +4,7 @@
 
 Web-based editor for geoip/geosite rule files used in V2Ray, Mihomo (Clash Meta) and similar proxy tools.
 
-🌐 **Live:** [geodat.bob4.fun](https://geodat.bob4.fun)
+🌐 **Live:** [https://geodat.bob4.fun](https://geodat.bob4.fun)
 
 ## Features
 
@@ -80,7 +80,7 @@ If you find this project useful, you can support the development:
 
 Веб-редактор файлов правил geoip/geosite для V2Ray, Mihomo (Clash Meta) и аналогичных прокси-инструментов.
 
-🌐 **Сайт:** [geodat.bob4.fun](https://geodat.bob4.fun)
+🌐 **Сайт:** [https://geodat.bob4.fun](https://geodat.bob4.fun)
 
 ## Возможности
 
