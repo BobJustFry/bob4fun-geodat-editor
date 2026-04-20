@@ -118,7 +118,7 @@ export default function App() {
       </div>
 
       <div className="status-bar">
-        <span>Geodat Editor v1.7.1</span>
+        <span>Geodat Editor v1.8.0</span>
         {editorData && (
           <span>
             {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} {t('categories')}

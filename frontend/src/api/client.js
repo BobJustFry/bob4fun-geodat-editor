@@ -18,6 +18,12 @@ export async function uploadFromUrl(url) {
   return res.json();
 }
 
+export async function fetchRawFile(sessionId, filename) {
+  const res = await fetch(`${BASE}/upload/raw/${encodeURIComponent(sessionId)}/${encodeURIComponent(filename)}`);
+  if (!res.ok) throw new Error('Failed to download raw file');
+  return res.arrayBuffer();
+}
+
 export async function parseFile(sessionId, filename) {
   const res = await fetch(`${BASE}/parse`, {
     method: 'POST',

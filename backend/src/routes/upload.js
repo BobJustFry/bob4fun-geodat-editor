@@ -54,6 +54,20 @@ router.post('/', upload.single('file'), (req, res) => {
 
 const ALLOWED_EXTENSIONS = ['.dat', '.db', '.mrs', '.yaml', '.yml', '.txt', '.json'];
 
+// Serve raw file for client-side parsing
+router.get('/raw/:sessionId/:filename', (req, res) => {
+  const safeSession = path.basename(req.params.sessionId);
+  const safeFilename = path.basename(req.params.filename);
+  const filePath = path.join(TMP_DIR, safeSession, safeFilename);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+
+  res.set('Content-Type', 'application/octet-stream');
+  fs.createReadStream(filePath).pipe(res);
+});
+
 router.post('/from-url', async (req, res) => {
   try {
     const { url } = req.body;

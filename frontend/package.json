@@ -1,7 +1,7 @@
 {
   "name": "geodat-editor-frontend",
   "private": true,
-  "version": "1.7.1",
+  "version": "1.8.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "protobufjs": "^8.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

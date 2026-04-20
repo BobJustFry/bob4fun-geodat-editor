@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
-import { uploadFile, uploadFromUrl, parseFile } from '../api/client.js';
+import { uploadFile, uploadFromUrl, parseFile, fetchRawFile } from '../api/client.js';
+import { parseGeosite, parseGeoip, detectType } from '../parsers/geodata.js';
 import { useI18n } from '../i18n.jsx';
 
 export default function FileUploader({ onLoaded, onError }) {
@@ -9,15 +10,50 @@ export default function FileUploader({ onLoaded, onError }) {
   const [urlInput, setUrlInput] = useState('');
   const inputRef = useRef(null);
 
+  const parseDatClientSide = useCallback(async (buffer, filename) => {
+    const guessedType = detectType(filename);
+
+    if (guessedType === 'geoip') {
+      const categories = parseGeoip(buffer);
+      return { format: 'v2ray', type: 'geoip', categories };
+    }
+    if (guessedType === 'geosite') {
+      const categories = parseGeosite(buffer);
+      return { format: 'v2ray', type: 'geosite', categories };
+    }
+    // Unknown - try geosite first, fallback to geoip
+    try {
+      const categories = parseGeosite(buffer);
+      if (categories.length > 0) return { format: 'v2ray', type: 'geosite', categories };
+    } catch { /* ignore */ }
+    const categories = parseGeoip(buffer);
+    return { format: 'v2ray', type: 'geoip', categories };
+  }, []);
+
   const processUpload = useCallback(async (uploadResult, displayName) => {
-    const parseResult = await parseFile(uploadResult.sessionId, uploadResult.filename);
-    onLoaded({
-      ...parseResult,
-      sessionId: uploadResult.sessionId,
-      filename: uploadResult.filename,
-      originalName: displayName
-    });
-  }, [onLoaded]);
+    const ext = displayName.split('.').pop().toLowerCase();
+
+    if (ext === 'dat') {
+      // Client-side parsing for .dat files — much faster
+      const buffer = await fetchRawFile(uploadResult.sessionId, uploadResult.filename);
+      const parseResult = await parseDatClientSide(buffer, displayName);
+      onLoaded({
+        ...parseResult,
+        sessionId: uploadResult.sessionId,
+        filename: uploadResult.filename,
+        originalName: displayName
+      });
+    } else {
+      // Server-side parsing for .mrs, .txt, .yaml etc
+      const parseResult = await parseFile(uploadResult.sessionId, uploadResult.filename);
+      onLoaded({
+        ...parseResult,
+        sessionId: uploadResult.sessionId,
+        filename: uploadResult.filename,
+        originalName: displayName
+      });
+    }
+  }, [onLoaded, parseDatClientSide]);
 
   const handleFile = useCallback(async (file) => {
     if (!file) return;
