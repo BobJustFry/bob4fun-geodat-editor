@@ -6,6 +6,8 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const { t } = useI18n();
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editTag, setEditTag] = useState('');
   const [filter, setFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('none'); // 'none', 'asc', 'desc'
   const [page, setPage] = useState(1);
@@ -17,6 +19,24 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
       setNewTag('');
       setAdding(false);
     }
+  };
+
+  const startEditing = (index, tag) => {
+    setEditingIndex(index);
+    setEditTag(tag);
+  };
+
+  const cancelEditing = () => {
+    setEditingIndex(null);
+    setEditTag('');
+  };
+
+  const handleSaveEdit = () => {
+    const trimmed = editTag.trim().toUpperCase();
+    if (!trimmed || editingIndex === null) return;
+    if (categories.some((cat, index) => index !== editingIndex && cat.tag === trimmed)) return;
+    onAdd(trimmed, editingIndex);
+    cancelEditing();
   };
 
   const toggleSort = () => {
@@ -113,25 +133,69 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
 
       <div className="category-items">
         {visibleCategories.map(({ cat, originalIndex }) => (
-          <div
-            key={`${cat.tag}-${originalIndex}`}
-            className={`category-item ${selected === originalIndex ? 'active' : ''}`}
-            onClick={() => onSelect(originalIndex)}
-          >
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.tag}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-              <span className="count">{cat.count}</span>
-              {!readOnly && categories.length > 1 && (
-                <span
-                  className="copy-btn"
-                  onClick={(e) => { e.stopPropagation(); onRemove(originalIndex); }}
-                  title={t('removeCategory')}
-                >
-                  ✕
-                </span>
-              )}
+          editingIndex === originalIndex ? (
+            <div key={`${cat.tag}-${originalIndex}`} className="category-item editing">
+              <input
+                type="text"
+                value={editTag}
+                onChange={(e) => setEditTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveEdit();
+                  if (e.key === 'Escape') cancelEditing();
+                }}
+                autoFocus
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  padding: '0.2rem 0.4rem',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '3px',
+                  color: 'var(--text)',
+                  fontSize: '0.8rem'
+                }}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
+                <button className="btn btn-sm btn-success" onClick={handleSaveEdit}>{t('add')}</button>
+                <button className="btn btn-sm" onClick={cancelEditing}>{t('cancel')}</button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div
+              key={`${cat.tag}-${originalIndex}`}
+              className={`category-item ${selected === originalIndex ? 'active' : ''}`}
+              onClick={() => onSelect(originalIndex)}
+              onDoubleClick={() => {
+                if (!readOnly) startEditing(originalIndex, cat.tag);
+              }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.tag}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <span className="count">{cat.count}</span>
+                {!readOnly && (
+                  <span
+                    className="copy-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEditing(originalIndex, cat.tag);
+                    }}
+                    title={t('edit')}
+                  >
+                    ✏️
+                  </span>
+                )}
+                {!readOnly && categories.length > 1 && (
+                  <span
+                    className="copy-btn"
+                    onClick={(e) => { e.stopPropagation(); onRemove(originalIndex); }}
+                    title={t('removeCategory')}
+                  >
+                    ✕
+                  </span>
+                )}
+              </div>
+            </div>
+          )
         ))}
       </div>
 

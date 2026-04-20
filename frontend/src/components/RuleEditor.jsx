@@ -349,7 +349,15 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
           }
 
           return (
-            <div key={`${value}-${i}`} className="rule-item">
+            <div
+              key={`${value}-${i}`}
+              className="rule-item"
+              onDoubleClick={() => {
+                setEditingIndex(actualIndex);
+                setEditValue(value);
+                if (isDomain) setEditType(ruleType);
+              }}
+            >
               {invalidRules.has(actualIndex) && <span title="Invalid format" style={{ color: 'var(--warning)', fontSize: '0.9rem', flexShrink: 0 }}>⚠️</span>}
               {ruleType && <span className="rule-type">{ruleType}</span>}
               <span className="rule-value" title={value}>{value}</span>

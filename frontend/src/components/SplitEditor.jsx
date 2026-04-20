@@ -213,6 +213,15 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
     setSelectedCat(updated.categories.length - 1);
   };
 
+  const handleRenameCategory = (tag, index) => {
+    const trimmed = tag.trim().toUpperCase();
+    if (!trimmed) return;
+    const updated = { ...editorData };
+    updated.categories = [...updated.categories];
+    updated.categories[index] = { ...updated.categories[index], tag: trimmed };
+    setEditorData(updated);
+  };
+
   const handleRemoveCategory = (index) => {
     const updated = { ...editorData };
     updated.categories = updated.categories.filter((_, i) => i !== index);
@@ -283,7 +292,13 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
             categories={editorData.categories}
             selected={selectedCat}
             onSelect={setSelectedCat}
-            onAdd={handleAddCategory}
+            onAdd={(tag, index) => {
+              if (typeof index === 'number') {
+                handleRenameCategory(tag, index);
+                return;
+              }
+              handleAddCategory(tag);
+            }}
             onRemove={handleRemoveCategory}
             width={editorResize.width}
           />
