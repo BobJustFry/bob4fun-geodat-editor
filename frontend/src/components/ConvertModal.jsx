@@ -13,7 +13,8 @@ export default function ConvertModal({ data, onClose, showToast }) {
       const { blob, filename } = await downloadFile(
         data.categories,
         targetFormat,
-        data.type
+        data.type,
+        data.filename
       );
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

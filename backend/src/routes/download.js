@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { categories, format, type } = req.body;
+    const { categories, format, type, outputName } = req.body;
 
     if (!categories || !format || !type) {
       return res.status(400).json({ error: 'categories, format, and type required' });
@@ -19,10 +19,10 @@ router.post('/', async (req, res) => {
     if (format === 'v2ray') {
       if (type === 'geosite') {
         buffer = await buildGeosite(categories);
-        filename = 'geosite.dat';
+        filename = outputName ? `${outputName}.dat` : 'geosite.dat';
       } else {
         buffer = await buildGeoip(categories);
-        filename = 'geoip.dat';
+        filename = outputName ? `${outputName}.dat` : 'geoip.dat';
       }
       contentType = 'application/octet-stream';
     } else if (format === 'mrs') {
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
         text = (cat.cidrs || []).join('\n');
       }
       buffer = await textToMrs(text, mrsBehavior);
-      filename = `${cat.tag || 'output'}.mrs`;
+      filename = `${outputName || cat.tag || 'output'}.mrs`;
       contentType = 'application/octet-stream';
     } else if (format === 'text') {
       const cat = categories[0];
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
         text = (cat.cidrs || []).join('\n');
       }
       buffer = Buffer.from(text + '\n', 'utf-8');
-      filename = `${cat.tag || 'output'}.txt`;
+      filename = `${outputName || cat.tag || 'output'}.txt`;
       contentType = 'text/plain';
     } else {
       return res.status(400).json({ error: `Unsupported format: ${format}` });

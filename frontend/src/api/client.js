@@ -54,11 +54,11 @@ export async function convertFile(categories, sourceFormat, targetFormat, type) 
   return res.json();
 }
 
-export async function downloadFile(categories, format, type) {
+export async function downloadFile(categories, format, type, outputName) {
   const res = await fetch(`${BASE}/download`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ categories, format, type })
+    body: JSON.stringify({ categories, format, type, outputName })
   });
   if (!res.ok) throw new Error((await res.json()).error || 'Download failed');
   const blob = await res.blob();
