@@ -294,8 +294,10 @@ body {
 .category-list {
   width: 200px;
   border-right: 1px solid var(--border);
-  overflow-y: auto;
+  overflow: hidden;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .resize-handle {
@@ -355,6 +357,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
 .rule-toolbar {
@@ -364,6 +367,11 @@ body {
   align-items: center;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow);
 }
 
 .rule-toolbar input {
@@ -386,6 +394,7 @@ body {
   overflow-y: auto;
   font-family: 'Cascadia Code', 'Fira Code', monospace;
   font-size: 0.82rem;
+  min-height: 0;
 }
 
 .rule-item {
@@ -460,6 +469,11 @@ body {
   gap: 0.5rem;
   padding: 0.4rem 0.8rem;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 38px;
+  z-index: 10;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
 .add-rule-form input {
@@ -754,7 +768,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;.
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -826,6 +840,11 @@ body {
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   font-size: 0.75rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: var(--bg-secondary);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .pagination-controls {
@@ -852,6 +871,24 @@ body {
 .category-items {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
+}
+
+/* CategoryList toolbar sections */
+.category-list > div:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.category-list > div:nth-child(2) {
+  position: sticky;
+  top: 80px;
+  z-index: 10;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
 /* Selection indicator */
