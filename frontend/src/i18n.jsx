@@ -19,6 +19,7 @@ const translations = {
 
     // File uploader
     largeFileWarning: 'This file is larger than 30 MB and may slow down or crash your browser. Continue anyway?',
+    pasteSkippedDups: 'Skipped duplicates',
     invalidFileDat: 'Invalid .dat file: expected binary protobuf format',
     invalidFileMrs: 'Invalid .mrs file: expected zstd-compressed MRS format',
     invalidFileEmpty: 'File appears to be empty or has no valid rules',
@@ -124,6 +125,7 @@ const translations = {
 
     // File uploader
     largeFileWarning: 'Этот файл больше 30 МБ и может замедлить или уронить браузер. Продолжить всё равно?',
+    pasteSkippedDups: 'Пропущено дубликатов',
     invalidFileDat: 'Неверный .dat файл: ожидается бинарный формат protobuf',
     invalidFileMrs: 'Неверный .mrs файл: ожидается zstd-сжатый MRS формат',
     invalidFileEmpty: 'Файл пуст или не содержит валидных правил',

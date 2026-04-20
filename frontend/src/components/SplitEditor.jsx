@@ -310,6 +310,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
             onRemove={handleRemoveRule}
             onEdit={handleEditRule}
             loading={loadingRules}
+            showToast={showToast}
           />
         </div>
       </div>

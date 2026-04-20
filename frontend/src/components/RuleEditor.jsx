@@ -77,7 +77,7 @@ const normalizeIPv4 = (input) => {
 };
 
 
-export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, loading }) {
+export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, loading, showToast }) {
   const { t } = useI18n();
   const [filter, setFilter] = useState('');
   const [newValue, setNewValue] = useState('');
@@ -129,35 +129,40 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
         if (values.length === 0) return;
 
         if (isDomain) {
-          // Валидируем все значения
-          const isValid = values.every(v => isValidDomain(v));
-          if (!isValid) {
-            // Если не все валидны, не добавляем ничего
-            return;
-          }
+          // Валидируем
+          const valid = values.filter(v => isValidDomain(v));
+          if (valid.length === 0) return;
 
-          // Добавляем все валидные правила одним вызовом
-          onAdd(values.map(v => ({ type: newType, value: v, attrs: [] })));
+          // Дедупликация: пропускаем уже существующие
+          const existingSet = new Set(rules.map(r => r.value));
+          const newOnes = valid.filter(v => !existingSet.has(v));
+          const skipped = valid.length - newOnes.length;
+          if (skipped > 0 && showToast) showToast(`${t('pasteSkippedDups')}: ${skipped}`, 'info');
+          if (newOnes.length === 0) return;
+
+          onAdd(newOnes.map(v => ({ type: newType, value: v, attrs: [] })));
         } else {
           // Нормализуем IPv4 адреса
           const processedValues = values.map(v => {
-            // Если это похоже на IPv4 (содержит только точки и цифры), пытаемся нормализовать
             if (/^[\d.\/]+$/.test(v)) {
               const normalized = normalizeIPv4(v);
               return normalized || v;
             }
-            return v; // IPv6 передаем как есть
+            return v;
           });
-          
-          // Валидируем все значения
-          const isValid = processedValues.every(v => isValidCIDR(v));
-          if (!isValid) {
-            // Если не все валидны, не добавляем ничего
-            return;
-          }
 
-          // Добавляем все валидные правила одним вызовом
-          onAdd(processedValues);
+          // Валидируем
+          const valid = processedValues.filter(v => isValidCIDR(v));
+          if (valid.length === 0) return;
+
+          // Дедупликация
+          const existingSet = new Set(rules);
+          const newOnes = valid.filter(v => !existingSet.has(v));
+          const skipped = valid.length - newOnes.length;
+          if (skipped > 0 && showToast) showToast(`${t('pasteSkippedDups')}: ${skipped}`, 'info');
+          if (newOnes.length === 0) return;
+
+          onAdd(newOnes);
         }
       } catch (err) {
         // Ошибка при чтении clipboard - игнорируем
@@ -166,7 +171,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
 
     document.addEventListener('paste', handlePaste);
     return () => document.removeEventListener('paste', handlePaste);
-  }, [isDomain, newType, onAdd, editingIndex]);
+  }, [isDomain, newType, onAdd, editingIndex, rules, showToast, t]);
 
   const filteredRules = useMemo(() => {
     if (!filter) return rules;

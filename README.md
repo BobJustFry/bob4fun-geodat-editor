@@ -16,11 +16,11 @@ Web-based editor for geoip/geosite rule files used in V2Ray, Mihomo (Clash Meta)
 - **Rename categories** — double-click the category name or use the ✏️ icon
 - **Search & filter** rules and categories
 - **Pagination** — configurable page size (default 50) for large rule lists
-- **Ctrl+V batch paste** — paste multiple rules at once from clipboard
+- **Ctrl+V batch paste** — paste multiple rules at once; duplicates are automatically skipped
 - **IPv4 auto-normalization** — CIDR prefixes are calculated automatically
 - **File validation** — content is checked before upload (magic bytes for `.dat`/`.mrs`, domain/IP sampling for `.txt`/`.yaml`)
 - **Large file warning** — confirmation dialog for files over 30 MB
-- **Dark / Light theme** toggle
+- **New file creation** — "New File" button with type (geosite/geoip) and format selection
 - **EN / RU** interface
 
 ## Supported Formats
@@ -88,12 +88,13 @@ If you find this project useful, you can support the development:
 - **Переименование категорий** — двойной клик по имени категории или иконка ✏️
 - **Поиск и фильтрация** правил и категорий
 - **Пагинация** — настраиваемый размер страницы (по умолчанию 50)
-- **Batch-вставка Ctrl+V** — вставка сразу нескольких правил из буфера обмена
+- **Batch-вставка Ctrl+V** — вставка сразу нескольких правил; дубликаты автоматически пропускаются
 - **Автонормализация IPv4** — префикс CIDR рассчитывается автоматически
 - **Валидация файлов** — проверка содержимого перед загрузкой (magic bytes для `.dat`/`.mrs`, семплирование доменов/IP для `.txt`/`.yaml`)
 - **Предупреждение о большом файле** — диалог подтверждения для файлов > 30 МБ
 - **Тёмная / светлая** тема
 - **Интерфейс на русском и английском** языках
+- **Создание нового файла** — кнопка «Новый файл» с выбором типа (geosite/geoip) и формата
 
 ## Поддерживаемые форматы
 
