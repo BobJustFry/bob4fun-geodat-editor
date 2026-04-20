@@ -136,10 +136,6 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
     setSelectedRules(new Set());
   };
 
-  const handleCopyGroup = () => {
-    onCopyRules(rules);
-  };
-
   return (
     <div className="panel">
       <div className="panel-header">
@@ -150,7 +146,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
             <span className="selection-count">{selectedRules.size} {t('selected')}</span>
             <button className="btn btn-sm btn-success" onClick={handleCopy}>
-              {t('copyToEditor')}
+              ← {t('copyToEditor')}
             </button>
             <button className="btn btn-sm" onClick={() => setSelectedRules(new Set())}>
               {t('clear')}
@@ -178,8 +174,11 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
               value={filter}
               onChange={(e) => { setFilter(e.target.value); setPage(1); }}
             />
-            <button className="btn btn-sm" onClick={selectAll}>{t('selectAll')}</button>
-            <button className="btn btn-sm btn-success" onClick={handleCopyGroup} title={t('copyGroupTitle')}>{t('copyGroup')}</button>
+            <button className="icon-btn" onClick={selectAll} title={t('selectAll')} style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}>☑</button>
+            <button className="icon-btn" onClick={() => setSelectedRules(new Set())} title={t('deselectAll')} style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}>☐</button>
+            <button className="btn btn-sm btn-success" onClick={handleCopy} disabled={selectedRules.size === 0} title={t('copySelectedTitle')}>
+              ← {selectedRules.size > 0 ? selectedRules.size : ''}
+            </button>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {filteredRules.length}/{rules.length}
             </span>
