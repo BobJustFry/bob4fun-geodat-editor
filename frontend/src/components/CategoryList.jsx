@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
 
-export default function CategoryList({ categories, selected, onSelect, onAdd, onRemove, width }) {
+export default function CategoryList({ categories, selected, onSelect, onAdd, onRemove, width, readOnly }) {
   const { t } = useI18n();
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
@@ -77,13 +77,15 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
         </button>
       </div>
 
-      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
-        <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
-          {t('addCategory')}
-        </button>
-      </div>
+      {!readOnly && (
+        <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
+          <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
+            {t('addCategory')}
+          </button>
+        </div>
+      )}
 
-      {adding && (
+      {!readOnly && adding && (
         <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <input
             type="text"
@@ -119,7 +121,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.tag}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <span className="count">{cat.count}</span>
-              {categories.length > 1 && (
+              {!readOnly && categories.length > 1 && (
                 <span
                   className="copy-btn"
                   onClick={(e) => { e.stopPropagation(); onRemove(originalIndex); }}

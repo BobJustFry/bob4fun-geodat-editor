@@ -167,6 +167,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
           onAdd={() => {}}
           onRemove={() => {}}
           width={donorResize.width}
+          readOnly
         />
         <div className="resize-handle" onMouseDown={donorResize.onMouseDown} />
         <div className="rule-list-container">

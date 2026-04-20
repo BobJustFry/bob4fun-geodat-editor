@@ -169,7 +169,7 @@ export default function App() {
       </main>
 
       <footer className="status-bar" role="contentinfo">
-        <span>Geodat Editor v1.9.0</span>
+        <span>Geodat Editor v1.9.1</span>
         {editorData && (
           <span>
             {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} {t('categories')}

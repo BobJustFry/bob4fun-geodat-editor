@@ -22,7 +22,7 @@ export default function AboutModal({ onClose }) {
         </div>
 
         <h2 className="about-title">{t('aboutTitle')}</h2>
-        <span className="about-version">v1.9.0</span>
+        <span className="about-version">v1.9.1</span>
 
         <p className="about-desc">
           {t('aboutDesc')}<br/>
