@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import FileUploader from './components/FileUploader.jsx';
 import SplitEditor from './components/SplitEditor.jsx';
 import ConvertModal from './components/ConvertModal.jsx';
@@ -12,6 +12,12 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [showConvert, setShowConvert] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -47,6 +53,13 @@ export default function App() {
           )}
           <button className="btn" onClick={() => setShowAbout(true)}>
             ℹ About
+          </button>
+          <button
+            className="theme-toggle"
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
         </div>
       </header>
@@ -95,7 +108,7 @@ export default function App() {
       </div>
 
       <div className="status-bar">
-        <span>Geodat Editor v1.4.0</span>
+        <span>Geodat Editor v1.5.0</span>
         {editorData && (
           <span>
             {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} categories

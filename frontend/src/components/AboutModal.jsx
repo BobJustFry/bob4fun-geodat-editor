@@ -9,7 +9,7 @@ export default function AboutModal({ onClose }) {
         </div>
 
         <h2 className="about-title">Geodat Editor</h2>
-        <span className="about-version">v1.4.0</span>
+        <span className="about-version">v1.5.0</span>
 
         <p className="about-desc">
           Web editor for geoip/geosite rule files.<br/>
