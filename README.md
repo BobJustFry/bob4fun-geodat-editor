@@ -1,3 +1,5 @@
+<img width="1514" height="846" alt="image" src="https://github.com/user-attachments/assets/74ce7615-73c6-4df7-8cb9-d918fd53ec4a" />
+
 # Geodat Editor
 
 Web-based editor for geoip/geosite rule files used in V2Ray, Mihomo (Clash Meta) and similar proxy tools.
