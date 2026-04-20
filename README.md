@@ -40,6 +40,12 @@ The app runs behind Caddy reverse proxy on port 443 (HTTPS).
 
 Environment: Docker, Node.js 22, Caddy 2.
 
+## Donate
+
+If you find this project useful, you can support the development:
+
+**USDT (BEP20):** `0x132b5cd3db0469537291fd398afaa50a96962f66`
+
 ---
 
 # Geodat Editor (RU)
@@ -83,3 +89,9 @@ docker compose up -d --build
 Приложение работает за Caddy reverse proxy на порту 443 (HTTPS).
 
 Окружение: Docker, Node.js 22, Caddy 2.
+
+## Донат
+
+Если проект оказался полезен, можете поддержать разработку:
+
+**USDT (BEP20):** `0x132b5cd3db0469537291fd398afaa50a96962f66`

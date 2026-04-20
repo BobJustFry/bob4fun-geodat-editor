@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
 import Pagination from './Pagination.jsx';
+import { useI18n } from '../i18n.jsx';
 
 export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) {
+  const { t } = useI18n();
   const [filter, setFilter] = useState('');
   const [newValue, setNewValue] = useState('');
   const [newType, setNewType] = useState('RootDomain');
@@ -48,7 +50,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
   if (!category) {
     return (
       <div className="rule-list-container">
-        <div className="loading">Select a category</div>
+        <div className="loading">{t('selectCategory')}</div>
       </div>
     );
   }
@@ -58,7 +60,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
       <div className="rule-toolbar">
         <input
           type="text"
-          placeholder="Filter rules..."
+          placeholder={t('filterRules')}
           value={filter}
           onChange={(e) => { setFilter(e.target.value); setPage(1); }}
         />
@@ -78,12 +80,12 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
         )}
         <input
           type="text"
-          placeholder={isDomain ? 'Add domain (e.g. google.com)' : 'Add CIDR (e.g. 10.0.0.0/8)'}
+          placeholder={isDomain ? t('addDomainPlaceholder') : t('addCidrPlaceholder')}
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
         />
-        <button className="btn btn-sm btn-success" onClick={handleAdd}>+ Add</button>
+        <button className="btn btn-sm btn-success" onClick={handleAdd}>{t('addBtn')}</button>
       </div>
 
       <div className="rule-list">
@@ -152,7 +154,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
                     setEditValue(value);
                     if (isDomain) setEditType(ruleType);
                   }}
-                  title="Edit"
+                  title={t('edit')}
                 >
                   ✏️
                 </span>
@@ -161,7 +163,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
                   onClick={() => {
                     navigator.clipboard.writeText(value);
                   }}
-                  title="Copy"
+                  title={t('copy')}
                 >
                   📋
                 </span>
@@ -170,7 +172,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit }) 
                   onClick={() => {
                     if (actualIndex >= 0) onRemove(actualIndex);
                   }}
-                  title="Remove"
+                  title={t('remove')}
                   style={{ color: 'var(--danger)' }}
                 >
                   ✕

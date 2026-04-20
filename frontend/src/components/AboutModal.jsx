@@ -1,4 +1,17 @@
+import { useState } from 'react';
+import { useI18n } from '../i18n.jsx';
+
 export default function AboutModal({ onClose }) {
+  const { t } = useI18n();
+  const [copied, setCopied] = useState(false);
+  const wallet = '0x132b5cd3db0469537291fd398afaa50a96962f66';
+
+  const copyWallet = () => {
+    navigator.clipboard.writeText(wallet);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="about-modal" onClick={(e) => e.stopPropagation()}>
@@ -8,19 +21,19 @@ export default function AboutModal({ onClose }) {
           <img src="/android-chrome-512x512.png" alt="Bob4Fun" />
         </div>
 
-        <h2 className="about-title">Geodat Editor</h2>
-        <span className="about-version">v1.5.0</span>
+        <h2 className="about-title">{t('aboutTitle')}</h2>
+        <span className="about-version">v1.6.1</span>
 
         <p className="about-desc">
-          Web editor for geoip/geosite rule files.<br/>
-          Supports V2Ray .dat, Mihomo .mrs, text and YAML formats.
+          {t('aboutDesc')}<br/>
+          {t('aboutDesc2')}
         </p>
 
         <div className="about-features">
-          <div className="about-feature">📝 Edit rules & categories inline</div>
-          <div className="about-feature">📂 Load files via drag & drop or URL</div>
-          <div className="about-feature">🔀 Split view with donor panel</div>
-          <div className="about-feature">💾 Export to .dat, .mrs, .txt</div>
+          <div className="about-feature">{t('featureEdit')}</div>
+          <div className="about-feature">{t('featureLoad')}</div>
+          <div className="about-feature">{t('featureSplit')}</div>
+          <div className="about-feature">{t('featureExport')}</div>
         </div>
 
         <div className="about-links">
@@ -37,8 +50,17 @@ export default function AboutModal({ onClose }) {
           </a>
         </div>
 
+        <div className="about-donate">
+          <div className="about-donate-label">{t('donate')} · USDT (BEP20)</div>
+          <div className="about-wallet" onClick={copyWallet} title={t('clickToCopy')}>
+            <code>{wallet}</code>
+            <span className="about-wallet-icon">{copied ? '✓' : '📋'}</span>
+          </div>
+          {copied && <div className="about-copied">{t('walletCopied')}</div>}
+        </div>
+
         <div className="about-footer">
-          Made by <strong>Bob4Fun</strong> · 2025
+          {t('madeBy')} <strong>Bob4Fun</strong> · 2025
         </div>
       </div>
     </div>

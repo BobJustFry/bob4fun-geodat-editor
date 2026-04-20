@@ -3,8 +3,10 @@ import CategoryList from './CategoryList.jsx';
 import RuleEditor from './RuleEditor.jsx';
 import DonorPanel from './DonorPanel.jsx';
 import { downloadFile } from '../api/client.js';
+import { useI18n } from '../i18n.jsx';
 
 export default function SplitEditor({ editorData, setEditorData, donorData, showToast, onCloseEditor, onCloseDonor }) {
+  const { t } = useI18n();
   const [selectedCat, setSelectedCat] = useState(0);
   const [donorSelectedCat, setDonorSelectedCat] = useState(0);
 
@@ -70,13 +72,13 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
       const newRules = rules.filter(r => !existing.has(r.value));
       cat.domains = [...(cat.domains || []), ...newRules];
       cat.count = cat.domains.length;
-      showToast(`Copied ${newRules.length} domains`);
+      showToast(`${t('copied')} ${newRules.length} ${t('copiedDomains')}`);
     } else {
       const existing = new Set(cat.cidrs || []);
       const newRules = rules.filter(r => !existing.has(r));
       cat.cidrs = [...(cat.cidrs || []), ...newRules];
       cat.count = cat.cidrs.length;
-      showToast(`Copied ${newRules.length} CIDRs`);
+      showToast(`${t('copied')} ${newRules.length} ${t('copiedCidrs')}`);
     }
 
     updated.categories = [...updated.categories];
@@ -123,7 +125,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
-      showToast(`Downloaded ${filename}`);
+      showToast(`${t('downloaded')} ${filename}`);
     } catch (err) {
       showToast(err.message, 'error');
     }
@@ -133,13 +135,13 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
     <>
       <div className="panel">
         <div className="panel-header">
-          <span className="label">Editor</span>
+          <span className="label">{t('editor')}</span>
           <span className="filename">{editorData.originalName}</span>
           <span className="format-badge">{editorData.format}</span>
           <span className="format-badge">{editorData.type}</span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
             <button className="btn btn-sm btn-success" onClick={() => handleDownload(editorData.format)}>
-              ↓ Save
+              {t('save')}
             </button>
             {editorData.format !== 'text' && (
               <button className="btn btn-sm" onClick={() => handleDownload('text')}>
@@ -156,7 +158,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
                 ↓ .dat
               </button>
             )}
-            <button className="btn-close" onClick={onCloseEditor} title="Close Editor">✕</button>
+            <button className="btn-close" onClick={onCloseEditor} title={t('closeEditor')}>✕</button>
           </div>
         </div>
         <div className="panel-body" style={{ flexDirection: 'row' }}>

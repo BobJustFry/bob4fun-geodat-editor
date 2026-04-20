@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { downloadFile } from '../api/client.js';
+import { useI18n } from '../i18n.jsx';
 
 export default function ConvertModal({ data, onClose, showToast }) {
+  const { t } = useI18n();
   const [targetFormat, setTargetFormat] = useState('text');
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +21,7 @@ export default function ConvertModal({ data, onClose, showToast }) {
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
-      showToast(`Converted to ${filename}`);
+      showToast(`${t('convertedTo')} ${filename}`);
       onClose();
     } catch (err) {
       showToast(err.message, 'error');
@@ -31,15 +33,15 @@ export default function ConvertModal({ data, onClose, showToast }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>Convert & Download</h3>
+        <h3>{t('convertDownload')}</h3>
 
         <div className="form-group">
-          <label>Source</label>
-          <input type="text" readOnly value={`${data.format.toUpperCase()} · ${data.type} · ${data.categories.length} categories`} />
+          <label>{t('source')}</label>
+          <input type="text" readOnly value={`${data.format.toUpperCase()} · ${data.type} · ${data.categories.length} ${t('categories')}`} />
         </div>
 
         <div className="form-group">
-          <label>Target Format</label>
+          <label>{t('targetFormat')}</label>
           <select value={targetFormat} onChange={(e) => setTargetFormat(e.target.value)}>
             <option value="text">Text (.txt)</option>
             <option value="mrs">Mihomo MRS (.mrs)</option>
@@ -48,9 +50,9 @@ export default function ConvertModal({ data, onClose, showToast }) {
         </div>
 
         <div className="modal-actions">
-          <button className="btn" onClick={onClose}>Cancel</button>
+          <button className="btn" onClick={onClose}>{t('cancel')}</button>
           <button className="btn btn-primary" onClick={handleConvert} disabled={loading}>
-            {loading ? 'Converting...' : 'Convert & Download'}
+            {loading ? t('converting') : t('convertBtn')}
           </button>
         </div>
       </div>

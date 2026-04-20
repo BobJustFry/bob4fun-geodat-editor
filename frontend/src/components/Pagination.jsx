@@ -1,4 +1,7 @@
+import { useI18n } from '../i18n.jsx';
+
 export default function Pagination({ total, page, pageSize, onPageChange, onPageSizeChange, onLoadMore }) {
+  const { t } = useI18n();
   const shown = Math.min(page * pageSize, total);
   const hasMore = shown < total;
   const remaining = total - shown;
@@ -11,12 +14,12 @@ export default function Pagination({ total, page, pageSize, onPageChange, onPage
         </span>
         {hasMore && (
           <button className="btn btn-sm" onClick={onLoadMore}>
-            + Load more ({remaining})
+            {t('loadMore')} ({remaining})
           </button>
         )}
         {page > 1 && (
           <button className="btn btn-sm" onClick={() => onPageChange(1)}>
-            Collapse
+            {t('collapse')}
           </button>
         )}
       </div>
@@ -28,7 +31,7 @@ export default function Pagination({ total, page, pageSize, onPageChange, onPage
         <option value={25}>25</option>
         <option value={50}>50</option>
         <option value={100}>100</option>
-        <option value={Infinity}>All</option>
+        <option value={Infinity}>{t('all')}</option>
       </select>
     </div>
   );

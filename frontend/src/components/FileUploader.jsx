@@ -1,7 +1,9 @@
 import { useState, useRef, useCallback } from 'react';
 import { uploadFile, uploadFromUrl, parseFile } from '../api/client.js';
+import { useI18n } from '../i18n.jsx';
 
 export default function FileUploader({ onLoaded, onError }) {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [dragover, setDragover] = useState(false);
   const [urlInput, setUrlInput] = useState('');
@@ -55,7 +57,7 @@ export default function FileUploader({ onLoaded, onError }) {
     return (
       <div className="loading">
         <div className="spinner" />
-        Loading file...
+        {t('loadingFile')}
       </div>
     );
   }
@@ -65,13 +67,13 @@ export default function FileUploader({ onLoaded, onError }) {
       <div className="url-input-row">
         <input
           type="text"
-          placeholder="Paste a URL to a file..."
+          placeholder={t('urlPlaceholder')}
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleUrl()}
         />
         <button className="btn btn-sm" onClick={handleUrl} disabled={!urlInput.trim()}>
-          ↓ Fetch
+          {t('fetch')}
         </button>
       </div>
       <div
@@ -83,8 +85,8 @@ export default function FileUploader({ onLoaded, onError }) {
       >
         <div className="icon">📁</div>
         <p>
-          Drop a file here or click to browse<br/>
-          <small>Supports: .dat (V2Ray), .mrs (Mihomo), .txt, .yaml</small>
+          {t('dropFile')}<br/>
+          <small>{t('supports')}</small>
         </p>
         <input
           ref={inputRef}

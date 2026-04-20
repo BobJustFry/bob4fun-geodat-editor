@@ -657,6 +657,51 @@ body {
   color: var(--text-muted);
 }
 
+.about-donate {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.about-donate-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.about-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.about-wallet:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.about-wallet code {
+  font-size: 0.65rem;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.about-wallet-icon {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.about-copied {
+  font-size: 0.72rem;
+  color: var(--success);
+  margin-top: 0.3rem;
+}
+
 /* Loading */
 .loading {
   display: flex;
@@ -716,6 +761,31 @@ body {
 }
 
 .theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+/* Language toggle */
+.lang-toggle {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  letter-spacing: 0.02em;
+}
+
+.lang-toggle:hover {
   color: var(--accent);
   border-color: var(--accent);
   background: var(--accent-glow);

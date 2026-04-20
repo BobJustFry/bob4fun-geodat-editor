@@ -4,8 +4,10 @@ import SplitEditor from './components/SplitEditor.jsx';
 import ConvertModal from './components/ConvertModal.jsx';
 import AboutModal from './components/AboutModal.jsx';
 import Toast from './components/Toast.jsx';
+import { useI18n } from './i18n.jsx';
 
 export default function App() {
+  const { t, lang, setLanguage } = useI18n();
   const [editorData, setEditorData] = useState(null);
   const [donorData, setDonorData] = useState(null);
   const [editorDirty, setEditorDirty] = useState(false);
@@ -31,11 +33,11 @@ export default function App() {
 
   const handleCloseEditor = useCallback(() => {
     if (editorDirty) {
-      if (!window.confirm('Editor has unsaved changes. Close anyway?')) return;
+      if (!window.confirm(t('unsavedChanges'))) return;
     }
     setEditorData(null);
     setEditorDirty(false);
-  }, [editorDirty]);
+  }, [editorDirty, t]);
 
   const handleCloseDonor = useCallback(() => {
     setDonorData(null);
@@ -48,16 +50,23 @@ export default function App() {
         <div className="header-actions">
           {editorData && (
             <button className="btn" onClick={() => setShowConvert(true)}>
-              ⇄ Convert
+              {t('convert')}
             </button>
           )}
           <button className="btn" onClick={() => setShowAbout(true)}>
-            ℹ About
+            {t('about')}
+          </button>
+          <button
+            className="lang-toggle"
+            onClick={() => setLanguage(lang === 'en' ? 'ru' : 'en')}
+            title={lang === 'en' ? 'Русский' : 'English'}
+          >
+            {lang === 'en' ? 'RU' : 'EN'}
           </button>
           <button
             className="theme-toggle"
-            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            onClick={() => setTheme(t2 => t2 === 'dark' ? 'light' : 'dark')}
+            title={theme === 'dark' ? t('lightTheme') : t('darkTheme')}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
@@ -68,13 +77,13 @@ export default function App() {
         {!editorData ? (
           <div className="panel">
             <div className="panel-header">
-              <span className="label">Editor</span>
+              <span className="label">{t('editor')}</span>
             </div>
             <FileUploader
               onLoaded={(data) => {
                 setEditorData(data);
                 setEditorDirty(false);
-                showToast(`Loaded: ${data.categories.length} categories`);
+                showToast(`${t('loaded')}: ${data.categories.length} ${t('categories')}`);
               }}
               onError={(msg) => showToast(msg, 'error')}
             />
@@ -93,13 +102,13 @@ export default function App() {
         {!donorData && editorData && (
           <div className="panel">
             <div className="panel-header">
-              <span className="label">Donor</span>
-              <span className="filename">— drag a file to use as source</span>
+              <span className="label">{t('donor')}</span>
+              <span className="filename">{t('donorHint')}</span>
             </div>
             <FileUploader
               onLoaded={(data) => {
                 setDonorData(data);
-                showToast(`Donor loaded: ${data.categories.length} categories`);
+                showToast(`${t('donorLoaded')}: ${data.categories.length} ${t('categories')}`);
               }}
               onError={(msg) => showToast(msg, 'error')}
             />
@@ -108,15 +117,15 @@ export default function App() {
       </div>
 
       <div className="status-bar">
-        <span>Geodat Editor v1.5.0</span>
+        <span>Geodat Editor v1.6.1</span>
         {editorData && (
           <span>
-            {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} categories
+            {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} {t('categories')}
           </span>
         )}
         {donorData && (
           <span>
-            Donor: {donorData.format.toUpperCase()} · {donorData.categories.length} categories
+            {t('donor')}: {donorData.format.toUpperCase()} · {donorData.categories.length} {t('categories')}
           </span>
         )}
       </div>

@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
 import CategoryList from './CategoryList.jsx';
 import Pagination from './Pagination.jsx';
+import { useI18n } from '../i18n.jsx';
 
 export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type, onClose }) {
+  const { t } = useI18n();
   const [filter, setFilter] = useState('');
   const [selectedRules, setSelectedRules] = useState(new Set());
   const [page, setPage] = useState(1);
@@ -52,21 +54,21 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
   return (
     <div className="panel">
       <div className="panel-header">
-        <span className="label">Donor</span>
+        <span className="label">{t('donor')}</span>
         <span className="filename">{data.originalName}</span>
         <span className="format-badge">{data.format}</span>
         {selectedRules.size > 0 && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-            <span className="selection-count">{selectedRules.size} selected</span>
+            <span className="selection-count">{selectedRules.size} {t('selected')}</span>
             <button className="btn btn-sm btn-success" onClick={handleCopy}>
-              → Copy to Editor
+              {t('copyToEditor')}
             </button>
             <button className="btn btn-sm" onClick={() => setSelectedRules(new Set())}>
-              Clear
+              {t('clear')}
             </button>
           </div>
         )}
-        <button className="btn-close" onClick={onClose} title="Close Donor" style={{ marginLeft: selectedRules.size > 0 ? '0.3rem' : 'auto' }}>✕</button>
+        <button className="btn-close" onClick={onClose} title={t('closeDonor')} style={{ marginLeft: selectedRules.size > 0 ? '0.3rem' : 'auto' }}>✕</button>
       </div>
       <div className="panel-body" style={{ flexDirection: 'row' }}>
         <CategoryList
@@ -80,11 +82,11 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
           <div className="rule-toolbar">
             <input
               type="text"
-              placeholder="Filter..."
+              placeholder={t('filter')}
               value={filter}
               onChange={(e) => { setFilter(e.target.value); setPage(1); }}
             />
-            <button className="btn btn-sm" onClick={selectAll}>Select All</button>
+            <button className="btn btn-sm" onClick={selectAll}>{t('selectAll')}</button>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {filteredRules.length}/{rules.length}
             </span>

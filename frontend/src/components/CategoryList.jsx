@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
 import Pagination from './Pagination.jsx';
+import { useI18n } from '../i18n.jsx';
 
 export default function CategoryList({ categories, selected, onSelect, onAdd, onRemove }) {
+  const { t } = useI18n();
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [page, setPage] = useState(1);
@@ -27,7 +29,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
     <div className="category-list">
       <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
         <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
-          + Category
+          {t('addCategory')}
         </button>
       </div>
 
@@ -38,7 +40,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            placeholder="TAG name"
+            placeholder={t('tagPlaceholder')}
             autoFocus
             style={{
               width: '100%',
@@ -51,8 +53,8 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
             }}
           />
           <div style={{ display: 'flex', gap: '0.2rem', marginTop: '0.2rem' }}>
-            <button className="btn btn-sm btn-success" onClick={handleAdd}>Add</button>
-            <button className="btn btn-sm" onClick={() => setAdding(false)}>Cancel</button>
+            <button className="btn btn-sm btn-success" onClick={handleAdd}>{t('add')}</button>
+            <button className="btn btn-sm" onClick={() => setAdding(false)}>{t('cancel')}</button>
           </div>
         </div>
       )}
@@ -73,7 +75,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
                   <span
                     className="copy-btn"
                     onClick={(e) => { e.stopPropagation(); onRemove(realIndex); }}
-                    title="Remove category"
+                    title={t('removeCategory')}
                   >
                     ✕
                   </span>
