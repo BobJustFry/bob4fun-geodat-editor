@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
         text = (cat.cidrs || []).join('\n');
       }
       buffer = await textToMrs(text, mrsBehavior);
-      filename = `${outputName || cat.tag || 'output'}.mrs`;
+      filename = `${cat.tag || 'output'}.mrs`;
       contentType = 'application/octet-stream';
     } else if (format === 'text') {
       const cat = categories[0];
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
         text = (cat.cidrs || []).join('\n');
       }
       buffer = Buffer.from(text + '\n', 'utf-8');
-      filename = `${outputName || cat.tag || 'output'}.txt`;
+      filename = `${cat.tag || 'output'}.txt`;
       contentType = 'text/plain';
     } else {
       return res.status(400).json({ error: `Unsupported format: ${format}` });
