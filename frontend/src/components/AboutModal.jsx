@@ -18,11 +18,11 @@ export default function AboutModal({ onClose }) {
         <button className="btn-close" onClick={onClose} style={{ position: 'absolute', top: '0.8rem', right: '0.8rem' }}>✕</button>
 
         <div className="about-logo">
-          <img src="/android-chrome-512x512.png" alt="Bob4Fun" />
+          <img src="/android-chrome-512x512.png" alt="Geodat Editor - Free Online Geodata File Editor Logo" title="Geodat Editor Logo" loading="lazy" />
         </div>
 
         <h2 className="about-title">{t('aboutTitle')}</h2>
-        <span className="about-version">v1.8.8</span>
+        <span className="about-version">v1.9.0</span>
 
         <p className="about-desc">
           {t('aboutDesc')}<br/>

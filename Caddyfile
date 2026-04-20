@@ -1,3 +1,47 @@
 geodat.bob4.fun {
+	# Security headers for SEO and security
+	header / X-Content-Type-Options nosniff
+	header / X-Frame-Options DENY
+	header / X-XSS-Protection "1; mode=block"
+	header / Referrer-Policy strict-origin-when-cross-origin
+	header / Permissions-Policy "geolocation=(), microphone=(), camera=()"
+	
+	# Cache static assets with long expiration
+	@static {
+		path /dist/*
+		path /android-chrome-*
+		path /apple-touch-icon.png
+		path /favicon.ico
+	}
+	header @static Cache-Control "public, max-age=31536000, immutable"
+	
+	# Cache long for robots.txt and sitemap (but less aggressively than static)
+	@metadata {
+		path /robots.txt
+		path /sitemap.xml
+	}
+	header @metadata Cache-Control "public, max-age=86400"
+	header @metadata Content-Type "text/plain; charset=utf-8"
+	
+	# No cache for HTML (SPA entry point)
+	@html {
+		path /index.html
+		path /
+	}
+	header @html Cache-Control "public, max-age=0, must-revalidate"
+	header @html Content-Type "text/html; charset=utf-8"
+	
+	# Gzip compression for better SEO (smaller files = faster loading)
+	encode gzip
+	
+	# Serve static files from frontend/dist directory
+	root * /usr/share/caddy/dist
+	
+	# Try files in order: actual file -> dir/index.html -> /index.html (for SPA)
+	file_server
+	
+	# Reverse proxy for API if needed (uncomment if backend is needed)
+	# reverse_proxy /api app:3000
+	
 	reverse_proxy app:3000
 }

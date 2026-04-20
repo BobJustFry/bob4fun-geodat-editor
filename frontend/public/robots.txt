@@ -1,0 +1,26 @@
+# Robots.txt for Geodat Editor
+# Allow all search engines to crawl and index
+
+User-agent: *
+Allow: /
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /dist/
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+
+# Specific rules for Yandex (Russian search engine)
+User-agent: YandexBot
+Allow: /
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
+Sitemap: https://geodat.bob4fun.fun/sitemap.xml
+
+# Crawl delay (in seconds)
+Crawl-delay: 1
