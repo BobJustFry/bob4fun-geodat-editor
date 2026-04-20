@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react';
 import CategoryList from './CategoryList.jsx';
+import Pagination from './Pagination.jsx';
 
 export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type, onClose }) {
   const [filter, setFilter] = useState('');
   const [selectedRules, setSelectedRules] = useState(new Set());
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(100);
 
   const isDomain = type === 'geosite' || type === 'domain';
   const category = data.categories[selectedCat] || null;
@@ -17,6 +20,14 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
     }
     return rules.filter(r => r.toLowerCase().includes(lower));
   }, [rules, filter, isDomain]);
+
+  const paginatedRules = useMemo(() => {
+    if (pageSize === Infinity) return filteredRules;
+    const start = (page - 1) * pageSize;
+    return filteredRules.slice(start, start + pageSize);
+  }, [filteredRules, page, pageSize]);
+
+  const pageOffset = pageSize === Infinity ? 0 : (page - 1) * pageSize;
 
   const toggleRule = (index) => {
     const next = new Set(selectedRules);
@@ -72,7 +83,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
               type="text"
               placeholder="Filter..."
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) => { setFilter(e.target.value); setPage(1); }}
             />
             <button className="btn btn-sm" onClick={selectAll}>Select All</button>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -80,22 +91,23 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
             </span>
           </div>
           <div className="rule-list">
-            {filteredRules.map((rule, i) => {
+            {paginatedRules.map((rule, i) => {
+              const globalIndex = pageOffset + i;
               const value = isDomain ? rule.value : rule;
               const ruleType = isDomain ? rule.type : null;
-              const isSelected = selectedRules.has(i);
+              const isSelected = selectedRules.has(globalIndex);
 
               return (
                 <div
                   key={`${value}-${i}`}
                   className={`rule-item ${isSelected ? 'selected' : ''}`}
-                  onClick={() => toggleRule(i)}
+                  onClick={() => toggleRule(globalIndex)}
                   style={{ cursor: 'pointer' }}
                 >
                   <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={() => toggleRule(i)}
+                    onChange={() => toggleRule(globalIndex)}
                     style={{ accentColor: 'var(--accent)' }}
                   />
                   {ruleType && <span className="rule-type">{ruleType}</span>}
@@ -104,6 +116,14 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
               );
             })}
           </div>
+
+          <Pagination
+            total={filteredRules.length}
+            page={page}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+          />
         </div>
       </div>
     </div>

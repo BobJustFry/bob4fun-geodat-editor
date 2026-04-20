@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react';
+import Pagination from './Pagination.jsx';
 
 export default function RuleEditor({ category, type, onAdd, onRemove }) {
   const [filter, setFilter] = useState('');
   const [newValue, setNewValue] = useState('');
   const [newType, setNewType] = useState('RootDomain');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(100);
 
   const isDomain = type === 'geosite' || type === 'domain';
   const rules = isDomain ? (category?.domains || []) : (category?.cidrs || []);
@@ -16,6 +19,12 @@ export default function RuleEditor({ category, type, onAdd, onRemove }) {
     }
     return rules.filter(r => r.toLowerCase().includes(lower));
   }, [rules, filter, isDomain]);
+
+  const paginatedRules = useMemo(() => {
+    if (pageSize === Infinity) return filteredRules;
+    const start = (page - 1) * pageSize;
+    return filteredRules.slice(start, start + pageSize);
+  }, [filteredRules, page, pageSize]);
 
   const handleAdd = () => {
     const val = newValue.trim();
@@ -49,7 +58,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove }) {
           type="text"
           placeholder="Filter rules..."
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => { setFilter(e.target.value); setPage(1); }}
         />
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           {filteredRules.length}/{rules.length}
@@ -76,7 +85,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove }) {
       </div>
 
       <div className="rule-list">
-        {filteredRules.map((rule, i) => {
+        {paginatedRules.map((rule, i) => {
           const value = isDomain ? rule.value : rule;
           const ruleType = isDomain ? rule.type : null;
 
@@ -113,6 +122,14 @@ export default function RuleEditor({ category, type, onAdd, onRemove }) {
           );
         })}
       </div>
+
+      <Pagination
+        total={filteredRules.length}
+        page={page}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+      />
     </div>
   );
 }
