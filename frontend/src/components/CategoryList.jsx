@@ -7,7 +7,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(25);
 
   const handleAdd = () => {
     if (newTag.trim()) {

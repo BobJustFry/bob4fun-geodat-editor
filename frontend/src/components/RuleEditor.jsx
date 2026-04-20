@@ -8,7 +8,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
   const [newValue, setNewValue] = useState('');
   const [newType, setNewType] = useState('RootDomain');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(25);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [editType, setEditType] = useState('');

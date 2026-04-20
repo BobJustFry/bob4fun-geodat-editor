@@ -767,7 +767,8 @@ body {
 }
 
 /* Theme toggle */
-.theme-toggle {
+.theme-toggle,
+.icon-btn {
   width: 32px;
   height: 32px;
   border: 1px solid var(--border);
@@ -781,9 +782,11 @@ body {
   justify-content: center;
   transition: all 0.2s ease;
   box-shadow: var(--shadow);
+  padding: 0;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.icon-btn:hover {
   color: var(--accent);
   border-color: var(--accent);
   background: var(--accent-glow);

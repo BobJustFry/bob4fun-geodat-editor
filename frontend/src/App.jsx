@@ -53,9 +53,6 @@ export default function App() {
               {t('convert')}
             </button>
           )}
-          <button className="btn" onClick={() => setShowAbout(true)}>
-            {t('about')}
-          </button>
           <button
             className="lang-toggle"
             onClick={() => setLanguage(lang === 'en' ? 'ru' : 'en')}
@@ -69,6 +66,9 @@ export default function App() {
             title={theme === 'dark' ? t('lightTheme') : t('darkTheme')}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          <button className="icon-btn" onClick={() => setShowAbout(true)} title={t('about')}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           </button>
         </div>
       </header>
@@ -118,7 +118,7 @@ export default function App() {
       </div>
 
       <div className="status-bar">
-        <span>Geodat Editor v1.8.1</span>
+        <span>Geodat Editor v1.8.3</span>
         {editorData && (
           <span>
             {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} {t('categories')}

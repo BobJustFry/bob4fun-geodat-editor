@@ -9,7 +9,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
   const [filter, setFilter] = useState('');
   const [selectedRules, setSelectedRules] = useState(new Set());
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(25);
   const donorResize = useResizable({ storageKey: 'donor-cat-width' });
 
   const isDomain = type === 'geosite' || type === 'domain';
