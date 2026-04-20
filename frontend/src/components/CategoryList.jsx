@@ -7,6 +7,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [filter, setFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState('none'); // 'none', 'asc', 'desc'
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
@@ -18,38 +19,64 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
     }
   };
 
+  const toggleSort = () => {
+    setSortOrder(prev => prev === 'none' ? 'asc' : prev === 'asc' ? 'desc' : 'none');
+  };
+
+  const getSortIcon = () => {
+    return sortOrder === 'asc' ? '▲' : sortOrder === 'desc' ? '▼' : '⇅';
+  };
+
   // Filter categories and keep original indices
-  const filteredCategories = useMemo(() => {
-    return categories.map((cat, i) => ({ cat, originalIndex: i })).filter(({ cat }) => {
+  const filteredAndSortedCategories = useMemo(() => {
+    let result = categories.map((cat, i) => ({ cat, originalIndex: i })).filter(({ cat }) => {
       if (!filter) return true;
       return cat.tag.toLowerCase().includes(filter.toLowerCase());
     });
-  }, [categories, filter]);
+    
+    if (sortOrder === 'asc') {
+      result = [...result].sort((a, b) => a.cat.tag.localeCompare(b.cat.tag));
+    } else if (sortOrder === 'desc') {
+      result = [...result].sort((a, b) => b.cat.tag.localeCompare(a.cat.tag));
+    }
+    
+    return result;
+  }, [categories, filter, sortOrder]);
 
   const visibleCategories = useMemo(() => {
-    if (pageSize === Infinity) return filteredCategories;
-    return filteredCategories.slice(0, page * pageSize);
-  }, [filteredCategories, page, pageSize]);
+    if (pageSize === Infinity) return filteredAndSortedCategories;
+    return filteredAndSortedCategories.slice(0, page * pageSize);
+  }, [filteredAndSortedCategories, page, pageSize]);
 
   return (
     <div className="category-list" style={width ? { width: `${width}px` } : undefined}>
       <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-        <input
-          type="text"
-          placeholder={t('filterCategories')}
-          value={filter}
-          onChange={(e) => { setFilter(e.target.value); setPage(1); }}
-          style={{
-            width: '100%',
-            padding: '0.3rem 0.5rem',
-            background: 'var(--input-bg)',
-            border: '1px solid var(--border)',
-            borderRadius: '3px',
-            color: 'var(--text)',
-            fontSize: '0.8rem',
-            outline: 'none'
-          }}
-        />
+        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder={t('filterCategories')}
+            value={filter}
+            onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+            style={{
+              flex: 1,
+              padding: '0.3rem 0.5rem',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: '3px',
+              color: 'var(--text)',
+              fontSize: '0.8rem',
+              outline: 'none'
+            }}
+          />
+          <button 
+            className="icon-btn" 
+            onClick={toggleSort}
+            title={sortOrder === 'none' ? 'Sort A-Z' : sortOrder === 'asc' ? 'Sort Z-A' : 'No sort'}
+            style={{ width: '32px', height: '32px', padding: 0 }}
+          >
+            {getSortIcon()}
+          </button>
+        </div>
         <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
           {t('addCategory')}
         </button>
@@ -105,9 +132,9 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
         ))}
       </div>
 
-      {filteredCategories.length > 25 && (
+      {filteredAndSortedCategories.length > 25 && (
         <Pagination
-          total={filteredCategories.length}
+          total={filteredAndSortedCategories.length}
           page={page}
           pageSize={pageSize}
           onPageChange={setPage}
