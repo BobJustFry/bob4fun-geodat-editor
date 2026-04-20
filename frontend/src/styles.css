@@ -505,6 +505,104 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* About Modal */
+.about-modal {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  min-width: 380px;
+  max-width: 440px;
+  text-align: center;
+  animation: aboutFadeIn 0.25s ease;
+}
+
+@keyframes aboutFadeIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.about-logo {
+  margin-bottom: 1rem;
+}
+
+.about-logo img {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.about-title {
+  font-size: 1.4rem;
+  margin: 0 0 0.3rem;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-version {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  padding: 0.15rem 0.6rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.about-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+.about-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.about-feature {
+  font-size: 0.78rem;
+  color: var(--text);
+  background: var(--bg-panel);
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.about-links {
+  margin-bottom: 1rem;
+}
+
+.about-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  background: #24292e;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.about-github:hover {
+  background: #444d56;
+}
+
+.about-footer {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 /* Loading */
 .loading {
   display: flex;

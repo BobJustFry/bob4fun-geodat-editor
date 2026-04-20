@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import FileUploader from './components/FileUploader.jsx';
 import SplitEditor from './components/SplitEditor.jsx';
 import ConvertModal from './components/ConvertModal.jsx';
+import AboutModal from './components/AboutModal.jsx';
 import Toast from './components/Toast.jsx';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
   const [editorDirty, setEditorDirty] = useState(false);
   const [toast, setToast] = useState(null);
   const [showConvert, setShowConvert] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -43,6 +45,9 @@ export default function App() {
               ⇄ Convert
             </button>
           )}
+          <button className="btn" onClick={() => setShowAbout(true)}>
+            ℹ About
+          </button>
         </div>
       </header>
 
@@ -90,7 +95,7 @@ export default function App() {
       </div>
 
       <div className="status-bar">
-        <span>Geodat Editor v1.3.1</span>
+        <span>Geodat Editor v1.4.0</span>
         {editorData && (
           <span>
             {editorData.format.toUpperCase()} · {editorData.type} · {editorData.categories.length} categories
@@ -110,6 +115,8 @@ export default function App() {
           showToast={showToast}
         />
       )}
+
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
 
       {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
