@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
 
@@ -88,6 +88,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
   const [editValue, setEditValue] = useState('');
   const [editType, setEditType] = useState('');
   const [invalidRules, setInvalidRules] = useState(new Set()); // Отслеживание невалидных правил
+  const editorRef = useRef(null);
 
   const isDomain = type === 'geosite' || type === 'domain';
   const rules = isDomain ? (category?.domains || []) : (category?.cidrs || []);
@@ -180,6 +181,47 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
     if (pageSize === Infinity) return filteredRules;
     return filteredRules.slice(0, page * pageSize);
   }, [filteredRules, page, pageSize]);
+
+  const handleSaveEdit = () => {
+    if (editingIndex === null) return false;
+
+    const trimmed = editValue.trim();
+    if (!trimmed) return false;
+
+    let finalValue = trimmed;
+    if (!isDomain && /^[\d.\/]+$/.test(trimmed)) {
+      const normalized = normalizeIPv4(trimmed);
+      if (!normalized) return false;
+      finalValue = normalized;
+    }
+
+    const isValid = isDomain ? isValidDomain(finalValue) : isValidCIDR(finalValue);
+    if (!isValid) return false;
+
+    const currentRule = rules[editingIndex];
+    const newRule = isDomain
+      ? { type: editType, value: finalValue, attrs: currentRule?.attrs || [] }
+      : finalValue;
+
+    onEdit(editingIndex, newRule);
+    setEditingIndex(null);
+    return true;
+  };
+
+  useEffect(() => {
+    if (editingIndex === null) return;
+
+    const handlePointerDown = (event) => {
+      if (editorRef.current && !editorRef.current.contains(event.target)) {
+        if (!handleSaveEdit()) {
+          setEditingIndex(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [editingIndex, editValue, editType, rules, isDomain]);
 
   const handleAdd = () => {
     const val = newValue.trim();
@@ -275,7 +317,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
 
           if (isEditing) {
             return (
-              <div key={`${value}-${i}`} className="rule-item editing">
+              <div key={`${value}-${i}`} className="rule-item editing" ref={editorRef}>
                 {isDomain && (
                   <select
                     value={editType}
@@ -294,26 +336,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      const trimmed = editValue.trim();
-                      if (!trimmed) return;
-                      
-                      // Нормализуем IPv4 если нужно
-                      let finalValue = trimmed;
-                      if (!isDomain && /^[\d.\/]+$/.test(trimmed)) {
-                        const normalized = normalizeIPv4(trimmed);
-                        if (!normalized) return; // Не сохраняем если нормализация не удалась
-                        finalValue = normalized;
-                      }
-                      
-                      // Валидируем перед сохранением
-                      const isValid = isDomain ? isValidDomain(finalValue) : isValidCIDR(finalValue);
-                      if (!isValid) return; // Не сохраняем невалидные данные
-                      
-                      const newRule = isDomain
-                        ? { type: editType, value: finalValue, attrs: rule.attrs || [] }
-                        : finalValue;
-                      onEdit(actualIndex, newRule);
-                      setEditingIndex(null);
+                      handleSaveEdit();
                     } else if (e.key === 'Escape') {
                       setEditingIndex(null);
                     }
@@ -321,28 +344,7 @@ export default function RuleEditor({ category, type, onAdd, onRemove, onEdit, lo
                   autoFocus
                   style={{ flex: 1, fontSize: '0.8rem', padding: '0.2rem 0.3rem' }}
                 />
-                <button className="btn btn-sm btn-success" onClick={() => {
-                  const trimmed = editValue.trim();
-                  if (!trimmed) return;
-                  
-                  // Нормализуем IPv4 если нужно
-                  let finalValue = trimmed;
-                  if (!isDomain && /^[\d.\/]+$/.test(trimmed)) {
-                    const normalized = normalizeIPv4(trimmed);
-                    if (!normalized) return; // Не сохраняем если нормализация не удалась
-                    finalValue = normalized;
-                  }
-                  
-                  // Валидируем перед сохранением
-                  const isValid = isDomain ? isValidDomain(finalValue) : isValidCIDR(finalValue);
-                  if (!isValid) return; // Не сохраняем невалидные данные
-                  
-                  const newRule = isDomain
-                    ? { type: editType, value: finalValue, attrs: rule.attrs || [] }
-                    : finalValue;
-                  onEdit(actualIndex, newRule);
-                  setEditingIndex(null);
-                }}>✓</button>
+                <button className="btn btn-sm btn-success" onClick={handleSaveEdit}>✓</button>
                 <button className="btn btn-sm" onClick={() => setEditingIndex(null)}>✗</button>
               </div>
             );

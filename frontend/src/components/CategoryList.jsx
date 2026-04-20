@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
 
@@ -12,6 +12,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const [sortOrder, setSortOrder] = useState('none'); // 'none', 'asc', 'desc'
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const editorRef = useRef(null);
 
   const handleAdd = () => {
     if (newTag.trim()) {
@@ -33,11 +34,27 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
 
   const handleSaveEdit = () => {
     const trimmed = editTag.trim().toUpperCase();
-    if (!trimmed || editingIndex === null) return;
-    if (categories.some((cat, index) => index !== editingIndex && cat.tag === trimmed)) return;
+    if (!trimmed || editingIndex === null) return false;
+    if (categories.some((cat, index) => index !== editingIndex && cat.tag === trimmed)) return false;
     onAdd(trimmed, editingIndex);
     cancelEditing();
+    return true;
   };
+
+  useEffect(() => {
+    if (editingIndex === null) return;
+
+    const handlePointerDown = (event) => {
+      if (editorRef.current && !editorRef.current.contains(event.target)) {
+        if (!handleSaveEdit()) {
+          cancelEditing();
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [editingIndex, editTag, categories]);
 
   const toggleSort = () => {
     setSortOrder(prev => prev === 'none' ? 'asc' : prev === 'asc' ? 'desc' : 'none');
@@ -134,7 +151,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
       <div className="category-items">
         {visibleCategories.map(({ cat, originalIndex }) => (
           editingIndex === originalIndex ? (
-            <div key={`${cat.tag}-${originalIndex}`} className="category-item editing">
+            <div key={`${cat.tag}-${originalIndex}`} className="category-item editing" ref={editorRef}>
               <input
                 type="text"
                 value={editTag}
