@@ -70,6 +70,10 @@ If you find this project useful, you can support the development:
 
 **USDT (BEP20):** `0x132b5cd3db0469537291fd398afaa50a96962f66`
 
+## Контакт
+
+[![Telegram](https://img.shields.io/badge/Telegram-@bobreyandrov-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/bobreyandrov)
+
 ---
 
 # Geodat Editor (RU) · v1.9.2
@@ -146,40 +150,3 @@ docker compose up -d --build
 ## Контакт
 
 [![Telegram](https://img.shields.io/badge/Telegram-@bobreyandrov-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/bobreyandrov)
-
-
-## Supported Formats
-
-| Format | Extension | Description |
-|--------|-----------|-------------|
-| V2Ray dat | `.dat` | Protobuf-encoded GeoSiteList / GeoIPList |
-| Mihomo MRS | `.mrs` | Zstd-compressed binary ruleset |
-| Text | `.txt` | One rule per line |
-| YAML | `.yaml`, `.yml` | YAML rule lists |
-
-## Usage
-
-1. Open the editor in browser
-2. Load a file (drag & drop, browse, or paste URL)
-3. Select a category from the left sidebar
-4. Edit rules: add, remove, or click ✏️ to edit inline
-5. Optionally load a donor file (second slot) and copy rules from it
-6. Export the result in the desired format using the download buttons
-
-## Deployment
-
-```bash
-docker compose up -d --build
-```
-
-The app runs behind Caddy reverse proxy on port 443 (HTTPS).
-
-Environment: Docker, Node.js 22, Caddy 2.
-
-## Donate
-
-If you find this project useful, you can support the development:
-
-**USDT (BEP20):** `0x132b5cd3db0469537291fd398afaa50a96962f66`
-
----
