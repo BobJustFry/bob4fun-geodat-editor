@@ -44,6 +44,23 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
     setEditorData(updated);
   };
 
+  const handleEditRule = (index, newRule) => {
+    const updated = { ...editorData };
+    const cat = { ...updated.categories[selectedCat] };
+
+    if (editorData.type === 'geosite' || editorData.type === 'domain') {
+      cat.domains = [...cat.domains];
+      cat.domains[index] = newRule;
+    } else {
+      cat.cidrs = [...cat.cidrs];
+      cat.cidrs[index] = newRule;
+    }
+
+    updated.categories = [...updated.categories];
+    updated.categories[selectedCat] = cat;
+    setEditorData(updated);
+  };
+
   const handleCopyFromDonor = (rules) => {
     const updated = { ...editorData };
     const cat = { ...updated.categories[selectedCat] };
@@ -152,6 +169,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
             type={editorData.type}
             onAdd={handleAddRule}
             onRemove={handleRemoveRule}
+            onEdit={handleEditRule}
           />
         </div>
       </div>
