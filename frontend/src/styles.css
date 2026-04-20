@@ -376,6 +376,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
   transition: background 0.1s;
 }
 
@@ -394,6 +395,15 @@ body {
   background: var(--tag-bg);
   padding: 0.1rem 0.4rem;
   border-radius: 10px;
+}
+
+.category-item .category-actions {
+  display: none;
+  gap: 0.3rem;
+}
+
+.category-item:hover .category-actions {
+  display: flex;
 }
 
 /* Rule list */

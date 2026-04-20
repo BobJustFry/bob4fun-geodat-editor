@@ -169,29 +169,32 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
                 if (!readOnly) startEditing(originalIndex, cat.tag);
               }}
             >
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.tag}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.tag}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
                 <span className="count">{cat.count}</span>
                 {!readOnly && (
-                  <span
-                    className="copy-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      startEditing(originalIndex, cat.tag);
-                    }}
-                    title={t('edit')}
-                  >
-                    ✏️
-                  </span>
-                )}
-                {!readOnly && categories.length > 1 && (
-                  <span
-                    className="copy-btn"
-                    onClick={(e) => { e.stopPropagation(); onRemove(originalIndex); }}
-                    title={t('removeCategory')}
-                  >
-                    ✕
-                  </span>
+                  <div className="category-actions">
+                    <span
+                      className="copy-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditing(originalIndex, cat.tag);
+                      }}
+                      title={t('edit')}
+                    >
+                      ✏️
+                    </span>
+                    {categories.length > 1 && (
+                      <span
+                        className="copy-btn"
+                        onClick={(e) => { e.stopPropagation(); onRemove(originalIndex); }}
+                        title={t('removeCategory')}
+                        style={{ color: 'var(--danger)' }}
+                      >
+                        ✕
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
