@@ -143,6 +143,10 @@ docker compose up -d --build
 
 **USDT (BEP20):** `0x132b5cd3db0469537291fd398afaa50a96962f66`
 
+## Контакт
+
+[![Telegram](https://img.shields.io/badge/Telegram-@bobreyandrov-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/bobreyandrov)
+
 
 ## Supported Formats
 
