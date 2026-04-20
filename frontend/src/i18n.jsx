@@ -27,6 +27,7 @@ const translations = {
 
     // Category list
     addCategory: '+ Category',
+    filterCategories: 'Search categories...',
     tagPlaceholder: 'TAG name',
     add: 'Add',
     cancel: 'Cancel',
@@ -116,6 +117,7 @@ const translations = {
 
     // Category list
     addCategory: '+ Категория',
+    filterCategories: 'Поиск категорий...',
     tagPlaceholder: 'Имя тега',
     add: 'Добавить',
     cancel: 'Отмена',

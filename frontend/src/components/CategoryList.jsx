@@ -6,6 +6,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
   const { t } = useI18n();
   const [adding, setAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
@@ -17,17 +18,38 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
     }
   };
 
-  const totalPages = Math.ceil(categories.length / pageSize);
-  const visibleCategories = useMemo(() => {
-    if (pageSize === Infinity) return categories;
-    return categories.slice(0, page * pageSize);
-  }, [categories, page, pageSize]);
+  // Filter categories and keep original indices
+  const filteredCategories = useMemo(() => {
+    return categories.map((cat, i) => ({ cat, originalIndex: i })).filter(({ cat }) => {
+      if (!filter) return true;
+      return cat.tag.toLowerCase().includes(filter.toLowerCase());
+    });
+  }, [categories, filter]);
 
-  const offset = 0;
+  const visibleCategories = useMemo(() => {
+    if (pageSize === Infinity) return filteredCategories;
+    return filteredCategories.slice(0, page * pageSize);
+  }, [filteredCategories, page, pageSize]);
 
   return (
     <div className="category-list" style={width ? { width: `${width}px` } : undefined}>
-      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+        <input
+          type="text"
+          placeholder={t('filterCategories')}
+          value={filter}
+          onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+          style={{
+            width: '100%',
+            padding: '0.3rem 0.5rem',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '3px',
+            color: 'var(--text)',
+            fontSize: '0.8rem',
+            outline: 'none'
+          }}
+        />
         <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
           {t('addCategory')}
         </button>
@@ -60,35 +82,32 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
       )}
 
       <div className="category-items">
-        {visibleCategories.map((cat, i) => {
-          const realIndex = offset + i;
-          return (
-            <div
-              key={`${cat.tag}-${realIndex}`}
-              className={`category-item ${selected === realIndex ? 'active' : ''}`}
-              onClick={() => onSelect(realIndex)}
-            >
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.tag}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <span className="count">{cat.count}</span>
-                {categories.length > 1 && (
-                  <span
-                    className="copy-btn"
-                    onClick={(e) => { e.stopPropagation(); onRemove(realIndex); }}
-                    title={t('removeCategory')}
-                  >
-                    ✕
-                  </span>
-                )}
-              </div>
+        {visibleCategories.map(({ cat, originalIndex }) => (
+          <div
+            key={`${cat.tag}-${originalIndex}`}
+            className={`category-item ${selected === originalIndex ? 'active' : ''}`}
+            onClick={() => onSelect(originalIndex)}
+          >
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.tag}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span className="count">{cat.count}</span>
+              {categories.length > 1 && (
+                <span
+                  className="copy-btn"
+                  onClick={(e) => { e.stopPropagation(); onRemove(originalIndex); }}
+                  title={t('removeCategory')}
+                >
+                  ✕
+                </span>
+              )}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
-      {categories.length > 25 && (
+      {filteredCategories.length > 25 && (
         <Pagination
-          total={categories.length}
+          total={filteredCategories.length}
           page={page}
           pageSize={pageSize}
           onPageChange={setPage}
