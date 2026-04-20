@@ -16,18 +16,19 @@ RUN npm ci --omit=dev
 FROM node:22-alpine
 
 # Install mihomo for MRS conversion
-RUN apk add --no-cache curl tar && \
+RUN apk add --no-cache curl jq && \
     ARCH=$(uname -m) && \
     case "$ARCH" in \
       x86_64) MIHOMO_ARCH="linux-amd64" ;; \
       aarch64) MIHOMO_ARCH="linux-arm64" ;; \
       *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
     esac && \
-    curl -fsSL "https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-${MIHOMO_ARCH}-v1.19.10.gz" -o /tmp/mihomo.gz && \
+    VERSION=$(curl -fsSL "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest" | jq -r .tag_name) && \
+    curl -fsSL "https://github.com/MetaCubeX/mihomo/releases/download/${VERSION}/mihomo-${MIHOMO_ARCH}-${VERSION}.gz" -o /tmp/mihomo.gz && \
     gunzip /tmp/mihomo.gz && \
     mv /tmp/mihomo /usr/local/bin/mihomo && \
     chmod +x /usr/local/bin/mihomo && \
-    apk del curl tar
+    apk del curl jq
 
 WORKDIR /app
 

@@ -4,7 +4,7 @@ import RuleEditor from './RuleEditor.jsx';
 import DonorPanel from './DonorPanel.jsx';
 import { downloadFile } from '../api/client.js';
 
-export default function SplitEditor({ editorData, setEditorData, donorData, showToast }) {
+export default function SplitEditor({ editorData, setEditorData, donorData, showToast, onCloseEditor, onCloseDonor }) {
   const [selectedCat, setSelectedCat] = useState(0);
   const [donorSelectedCat, setDonorSelectedCat] = useState(0);
 
@@ -117,7 +117,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
           <span className="filename">{editorData.originalName}</span>
           <span className="format-badge">{editorData.format}</span>
           <span className="format-badge">{editorData.type}</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.3rem' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
             <button className="btn btn-sm btn-success" onClick={() => handleDownload(editorData.format)}>
               ↓ Save
             </button>
@@ -136,6 +136,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
                 ↓ .dat
               </button>
             )}
+            <button className="btn-close" onClick={onCloseEditor} title="Close Editor">✕</button>
           </div>
         </div>
         <div className="panel-body" style={{ flexDirection: 'row' }}>
@@ -162,6 +163,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
           onSelectCat={setDonorSelectedCat}
           onCopyRules={handleCopyFromDonor}
           type={editorData.type}
+          onClose={onCloseDonor}
         />
       )}
     </>

@@ -7,6 +7,7 @@ import Toast from './components/Toast.jsx';
 export default function App() {
   const [editorData, setEditorData] = useState(null);
   const [donorData, setDonorData] = useState(null);
+  const [editorDirty, setEditorDirty] = useState(false);
   const [toast, setToast] = useState(null);
   const [showConvert, setShowConvert] = useState(false);
 
@@ -15,24 +16,31 @@ export default function App() {
     setTimeout(() => setToast(null), 3000);
   }, []);
 
+  const handleEditorUpdate = useCallback((data) => {
+    setEditorData(data);
+    setEditorDirty(true);
+  }, []);
+
+  const handleCloseEditor = useCallback(() => {
+    if (editorDirty) {
+      if (!window.confirm('Editor has unsaved changes. Close anyway?')) return;
+    }
+    setEditorData(null);
+    setEditorDirty(false);
+  }, [editorDirty]);
+
+  const handleCloseDonor = useCallback(() => {
+    setDonorData(null);
+  }, []);
+
   return (
     <div className="app">
       <header className="header">
         <h1>◆ Geodat Editor</h1>
         <div className="header-actions">
           {editorData && (
-            <>
-              <button className="btn" onClick={() => setShowConvert(true)}>
-                ⇄ Convert
-              </button>
-              <button className="btn btn-danger" onClick={() => setEditorData(null)}>
-                ✕ Close Editor
-              </button>
-            </>
-          )}
-          {donorData && (
-            <button className="btn btn-danger" onClick={() => setDonorData(null)}>
-              ✕ Close Donor
+            <button className="btn" onClick={() => setShowConvert(true)}>
+              ⇄ Convert
             </button>
           )}
         </div>
@@ -47,6 +55,7 @@ export default function App() {
             <FileUploader
               onLoaded={(data) => {
                 setEditorData(data);
+                setEditorDirty(false);
                 showToast(`Loaded: ${data.categories.length} categories`);
               }}
               onError={(msg) => showToast(msg, 'error')}
@@ -55,9 +64,11 @@ export default function App() {
         ) : (
           <SplitEditor
             editorData={editorData}
-            setEditorData={setEditorData}
+            setEditorData={handleEditorUpdate}
             donorData={donorData}
             showToast={showToast}
+            onCloseEditor={handleCloseEditor}
+            onCloseDonor={handleCloseDonor}
           />
         )}
 

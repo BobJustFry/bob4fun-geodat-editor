@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import CategoryList from './CategoryList.jsx';
 
-export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type }) {
+export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type, onClose }) {
   const [filter, setFilter] = useState('');
   const [selectedRules, setSelectedRules] = useState(new Set());
 
@@ -56,6 +56,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
             </button>
           </div>
         )}
+        <button className="btn-close" onClick={onClose} title="Close Donor" style={{ marginLeft: selectedRules.size > 0 ? '0.3rem' : 'auto' }}>✕</button>
       </div>
       <div className="panel-body" style={{ flexDirection: 'row' }}>
         <CategoryList
