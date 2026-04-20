@@ -197,7 +197,6 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
                 <div
                   key={`${value}-${i}`}
                   className={`rule-item ${isSelected ? 'selected' : ''}`}
-                  onClick={() => toggleRule(globalIndex)}
                   onMouseDown={(e) => { e.preventDefault(); handleDragStart(globalIndex); }}
                   onMouseEnter={() => handleDragEnter(globalIndex)}
                   style={{ cursor: 'pointer', userSelect: 'none' }}
@@ -205,8 +204,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
                   <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={() => toggleRule(globalIndex)}
-                    onClick={(e) => e.stopPropagation()}
+                    readOnly
                     style={{ accentColor: 'var(--accent)', pointerEvents: 'none' }}
                   />
                   {ruleType && <span className="rule-type">{ruleType}</span>}

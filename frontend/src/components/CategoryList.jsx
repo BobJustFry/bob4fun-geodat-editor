@@ -50,7 +50,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
 
   return (
     <div className="category-list" style={width ? { width: `${width}px` } : undefined}>
-      <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+      <div style={{ padding: '0.4rem 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
         <input
           type="text"
           placeholder={t('filterCategories')}
@@ -58,7 +58,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
           onChange={(e) => { setFilter(e.target.value); setPage(1); }}
           style={{
             flex: 1,
-            padding: '0.3rem 0.5rem',
+            padding: '0.4rem 0.5rem',
             background: 'var(--input-bg)',
             border: '1px solid var(--border)',
             borderRadius: '3px',
@@ -78,7 +78,7 @@ export default function CategoryList({ categories, selected, onSelect, onAdd, on
       </div>
 
       {!readOnly && (
-        <div style={{ padding: '0.3rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ padding: '0.5rem 0.5rem', borderBottom: '1px solid var(--border)' }}>
           <button className="btn btn-sm" onClick={() => setAdding(true)} style={{ width: '100%' }}>
             {t('addCategory')}
           </button>
