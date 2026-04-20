@@ -109,8 +109,11 @@ export default function SplitEditor({ editorData, setEditorData, donorData, show
 
   const handleDownload = async (format) => {
     try {
+      const cats = (format === 'mrs' || format === 'text')
+        ? [editorData.categories[selectedCat]]
+        : editorData.categories;
       const { blob, filename } = await downloadFile(
-        editorData.categories,
+        cats,
         format,
         editorData.type
       );
