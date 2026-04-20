@@ -4,7 +4,7 @@ import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
 import useResizable from './useResizable.js';
 
-export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, type, onClose, loading }) {
+export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules, onCopyCategory, type, onClose, loading }) {
   const { t } = useI18n();
   const [filter, setFilter] = useState('');
   const [selectedRules, setSelectedRules] = useState(new Set());
@@ -176,7 +176,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
             />
             <button className="icon-btn" onClick={selectAll} title={t('selectAll')} style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}>☑</button>
             <button className="icon-btn" onClick={() => setSelectedRules(new Set())} title={t('deselectAll')} style={{ width: '28px', height: '28px', padding: 0, flexShrink: 0 }}>☐</button>
-            <button className="btn btn-sm btn-success" onClick={() => { onCopyRules(rules); }} title={t('copyGroupTitle')}>
+            <button className="btn btn-sm btn-success" onClick={() => { onCopyCategory(data.categories[selectedCat]); }} title={t('copyGroupTitle')}>
               ← {t('copyGroup')}
             </button>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>

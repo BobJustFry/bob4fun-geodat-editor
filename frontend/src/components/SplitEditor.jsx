@@ -165,6 +165,40 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
     setEditorData(updated);
   };
 
+  const handleCopyCategoryFromDonor = (donorCategory) => {
+    const updated = { ...editorData };
+    const existingIndex = updated.categories.findIndex(c => c.tag === donorCategory.tag);
+
+    if (existingIndex >= 0) {
+      // Merge into existing category
+      const cat = { ...updated.categories[existingIndex] };
+      if (editorData.type === 'geosite' || editorData.type === 'domain') {
+        const existing = new Set((cat.domains || []).map(d => d.value));
+        const newRules = (donorCategory.domains || []).filter(r => !existing.has(r.value));
+        cat.domains = [...(cat.domains || []), ...newRules];
+        cat.count = cat.domains.length;
+        showToast(`${t('copied')} ${newRules.length} ${t('copiedDomains')} → ${cat.tag}`);
+      } else {
+        const existing = new Set(cat.cidrs || []);
+        const newRules = (donorCategory.cidrs || []).filter(r => !existing.has(r));
+        cat.cidrs = [...(cat.cidrs || []), ...newRules];
+        cat.count = cat.cidrs.length;
+        showToast(`${t('copied')} ${newRules.length} ${t('copiedCidrs')} → ${cat.tag}`);
+      }
+      updated.categories = [...updated.categories];
+      updated.categories[existingIndex] = cat;
+      setEditorData(updated);
+      setSelectedCat(existingIndex);
+    } else {
+      // Create new category
+      const newCat = { ...donorCategory };
+      updated.categories = [...updated.categories, newCat];
+      setEditorData(updated);
+      setSelectedCat(updated.categories.length - 1);
+      showToast(`${t('copied')} ${donorCategory.tag}`);
+    }
+  };
+
   const handleAddCategory = (tag) => {
     const updated = { ...editorData };
     const newCat = {
@@ -271,6 +305,7 @@ export default function SplitEditor({ editorData, setEditorData, donorData, setD
           selectedCat={donorSelectedCat}
           onSelectCat={setDonorSelectedCat}
           onCopyRules={handleCopyFromDonor}
+          onCopyCategory={handleCopyCategoryFromDonor}
           type={editorData.type}
           onClose={onCloseDonor}
           loading={loadingDonorRules}
