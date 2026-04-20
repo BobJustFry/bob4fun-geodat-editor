@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import CategoryList from './CategoryList.jsx';
 import Pagination from './Pagination.jsx';
 import { useI18n } from '../i18n.jsx';
@@ -44,6 +44,32 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
     const all = new Set(filteredRules.map((_, i) => i));
     setSelectedRules(all);
   };
+
+  // Drag-to-select
+  const dragRef = useRef({ active: false, selecting: true });
+
+  const handleDragStart = useCallback((index) => {
+    const selecting = !selectedRules.has(index);
+    dragRef.current = { active: true, selecting };
+    const next = new Set(selectedRules);
+    if (selecting) next.add(index); else next.delete(index);
+    setSelectedRules(next);
+  }, [selectedRules]);
+
+  const handleDragEnter = useCallback((index) => {
+    if (!dragRef.current.active) return;
+    setSelectedRules(prev => {
+      const next = new Set(prev);
+      if (dragRef.current.selecting) next.add(index); else next.delete(index);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleMouseUp = () => { dragRef.current.active = false; };
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => window.removeEventListener('mouseup', handleMouseUp);
+  }, []);
 
   const handleCopy = () => {
     const selected = filteredRules.filter((_, i) => selectedRules.has(i));
@@ -108,13 +134,16 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
                   key={`${value}-${i}`}
                   className={`rule-item ${isSelected ? 'selected' : ''}`}
                   onClick={() => toggleRule(globalIndex)}
-                  style={{ cursor: 'pointer' }}
+                  onMouseDown={(e) => { e.preventDefault(); handleDragStart(globalIndex); }}
+                  onMouseEnter={() => handleDragEnter(globalIndex)}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
                 >
                   <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggleRule(globalIndex)}
-                    style={{ accentColor: 'var(--accent)' }}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ accentColor: 'var(--accent)', pointerEvents: 'none' }}
                   />
                   {ruleType && <span className="rule-type">{ruleType}</span>}
                   <span className="rule-value" title={value}>{value}</span>
