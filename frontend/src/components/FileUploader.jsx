@@ -59,14 +59,31 @@ export default function FileUploader({ onLoaded, onError }) {
     if (!file) return;
     setLoading(true);
     try {
-      const uploadResult = await uploadFile(file);
-      await processUpload(uploadResult, file.name);
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (ext === 'dat') {
+        // Parse .dat directly in browser + upload in parallel
+        const [buffer, uploadResult] = await Promise.all([
+          file.arrayBuffer(),
+          uploadFile(file)
+        ]);
+        const parseResult = await parseDatClientSide(buffer, file.name);
+        onLoaded({
+          ...parseResult,
+          sessionId: uploadResult.sessionId,
+          filename: uploadResult.filename,
+          originalName: file.name
+        });
+      } else {
+        const uploadResult = await uploadFile(file);
+        await processUpload(uploadResult, file.name);
+      }
     } catch (err) {
       onError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [processUpload, onError]);
+  }, [processUpload, parseDatClientSide, onError, onLoaded]);
 
   const handleUrl = useCallback(async () => {
     const url = urlInput.trim();
