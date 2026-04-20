@@ -18,6 +18,12 @@ const translations = {
     unsavedChanges: 'Editor has unsaved changes. Close anyway?',
 
     // File uploader
+    largeFileWarning: 'This file is larger than 30 MB and may slow down or crash your browser. Continue anyway?',
+    invalidFileDat: 'Invalid .dat file: expected binary protobuf format',
+    invalidFileMrs: 'Invalid .mrs file: expected zstd-compressed MRS format',
+    invalidFileEmpty: 'File appears to be empty or has no valid rules',
+    invalidFileYaml: 'Invalid YAML ruleset: missing "payload:" key',
+    invalidFileContent: 'File content does not look like domains or IP addresses',
     loadingFile: 'Loading file...',
     loadingRules: 'Loading rules...',
     urlPlaceholder: 'Paste a URL to a file...',
@@ -110,6 +116,12 @@ const translations = {
     unsavedChanges: 'Есть несохранённые изменения. Закрыть?',
 
     // File uploader
+    largeFileWarning: 'Этот файл больше 30 МБ и может замедлить или уронить браузер. Продолжить всё равно?',
+    invalidFileDat: 'Неверный .dat файл: ожидается бинарный формат protobuf',
+    invalidFileMrs: 'Неверный .mrs файл: ожидается zstd-сжатый MRS формат',
+    invalidFileEmpty: 'Файл пуст или не содержит валидных правил',
+    invalidFileYaml: 'Неверный YAML: отсутствует ключ "payload:"',
+    invalidFileContent: 'Содержимое файла не похоже на домены или IP-адреса',
     loadingFile: 'Загрузка файла...',
     loadingRules: 'Загрузка правил...',
     urlPlaceholder: 'Вставьте URL файла...',

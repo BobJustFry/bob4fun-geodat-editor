@@ -1,7 +1,7 @@
 {
   "name": "geodat-editor-frontend",
   "private": true,
-  "version": "1.9.0",
+  "version": "1.9.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
