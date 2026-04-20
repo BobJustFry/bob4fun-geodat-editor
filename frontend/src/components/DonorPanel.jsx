@@ -51,6 +51,10 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
     setSelectedRules(new Set());
   };
 
+  const handleCopyGroup = () => {
+    onCopyRules(rules);
+  };
+
   return (
     <div className="panel">
       <div className="panel-header">
@@ -87,6 +91,7 @@ export default function DonorPanel({ data, selectedCat, onSelectCat, onCopyRules
               onChange={(e) => { setFilter(e.target.value); setPage(1); }}
             />
             <button className="btn btn-sm" onClick={selectAll}>{t('selectAll')}</button>
+            <button className="btn btn-sm btn-success" onClick={handleCopyGroup} title={t('copyGroupTitle')}>{t('copyGroup')}</button>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {filteredRules.length}/{rules.length}
             </span>

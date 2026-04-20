@@ -44,6 +44,8 @@ const translations = {
     // Donor panel
     selected: 'selected',
     copyToEditor: '→ Copy to Editor',
+    copyGroup: '→ Copy Group',
+    copyGroupTitle: 'Copy entire category to editor',
     clear: 'Clear',
     selectAll: 'Select All',
     filter: 'Filter...',
@@ -130,6 +132,8 @@ const translations = {
     // Donor panel
     selected: 'выбрано',
     copyToEditor: '→ В редактор',
+    copyGroup: '→ Копировать группу',
+    copyGroupTitle: 'Копировать всю категорию в редактор',
     clear: 'Сбросить',
     selectAll: 'Выбрать все',
     filter: 'Фильтр...',
